@@ -1,0 +1,28 @@
+<!-- 500.html -->
+{% extends "base.html" %}
+
+{% block title %}Server Error - BookWise{% endblock %}
+
+{% block content %}
+<div class="container" style="text-align: center; padding: 4rem 2rem;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div style="font-size: 8rem; color: var(--border-light); margin-bottom: 2rem;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1 style="font-size: 3rem; color: var(--text-primary); margin-bottom: 1rem;">
+            500 - Server Error
+        </h1>
+        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem;">
+            Oops! Our book recommendation engine is having a moment. Please try again in a few minutes.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <button onclick="window.location.reload()" class="btn btn-secondary">
+                <i class="fas fa-redo"></i> Try Again
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

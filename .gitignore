@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv/
+
+# Environment variables
+.env
+*.env
+
+# VSCode settings
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Pytest
+.cache/
+.pytest_cache/
+
+# Static site build cache (if using tools like React)
+build/
+dist/
+node_modules/
+
+# Jupyter Notebook checkpoints (if any)
+.ipynb_checkpoints/
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# MyPy
+.mypy_cache/
+
+# FastAPI/Flask specific
+instance/
+*.db
+*.sqlite3
+
+# Render/Replit
+render.yaml
+replit.nix
+.replit

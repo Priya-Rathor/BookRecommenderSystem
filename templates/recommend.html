@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+
+{% block title %}Find Your Next Book - BookWise{% endblock %}
+
+{% block head %}
+<style>
+    .search-section {
+        background: var(--gradient-primary);
+        padding: 3rem 0;
+        color: white;
+        text-align: center;
+    }
+
+    .search-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .search-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .search-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .search-form {
+        background: var(--bg-white);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+        margin-bottom: 2rem;
+    }
+
+    .search-input-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 3rem 1rem 1rem;
+        border: 2px solid var(--border-light);
+        border-radius: 12px;
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        pointer-events: none;
+    }
+
+    .autocomplete-container {
+        position: relative;
+    }
+
+    .autocomplete-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--bg-white);
+        border: 1px solid var(--border-light);
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 10;
+        display: none;
+    }
+
+    .autocomplete-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid var(--border-light);
+        transition: background-color 0.2s ease;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.selected {
+        background: rgba(102, 126, 234, 0.1);
+        color: var(--primary-color);
+    }
+
+    .autocomplete-item:last-child {
+        border-bottom: none;
+    }
+
+    .search-button {
+        width: 100%;
+        padding: 1rem 2rem;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .search-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .search-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .recommendations-section {
+        padding: 3rem 0;
+        min-height: 50vh;
+    }
+
+    .recommendations-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .recommendations-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .user-book {
+        display: inline-block;
+        background: var(--gradient-accent);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        margin: 0 0.5rem;
+    }
+
+    .recommendation-card {
+        background: var(--bg-white);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-light);
+        display: flex;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .recommendation-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .rec-book-image {
+        width: 100px;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        flex-shrink: 0;
+    }
+
+    .rec-book-info {
+        flex: 1;
+    }
+
+    .rec-book-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        line-height: 1.3;
+    }
+
+    .rec-book-author {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .recommendation-badge {
+        display: inline-block;
+        background: var(--gradient-primary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        background: #fed7d7;
+        color: #c53030;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        text-align: center;
+        border: 1px solid #feb2b2;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+    }
+
+    .no-results-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: var(--border-light);
+    }
+
+    .loading-spinner {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-light);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .how-it-works {
+        background: var(--bg-white);
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .how-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: var(--text-primary);
+    }
+
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+    }
+
+    .step {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: 50%;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .step-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .step-description {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .search-title {
+            font-size: 2rem;
+        }
+        
+        .search-form {
+            padding: 1.5rem;
+            margin: 0 1rem 2rem;
+        }
+        
+        .recommendation-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .rec-book-image {
+            align-self: center;
+        }
+        
+        .steps-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Search Section -->
+<section class="search-section">
+    <div class="search-container">
+        <h1 class="search-title">Find Your Perfect Book</h1>
+        <p class="search-subtitle">Enter a book title you enjoyed, and we'll recommend similar books you'll love</p>
+        
+        <form class="search-form" method="POST" action="/recommend_books" id="recommendForm">
+            <div class="autocomplete-container">
+                <div class="search-input-container">
+                    <input type="text" 
+                           name="user_input" 
+                           id="bookInput"
+                           class="search-input" 
+                           placeholder="Type a book title (e.g., 'The Great Gatsby', 'Harry Potter')"
+                           value="{{ user_input if user_input else '' }}"
+                           autocomplete="off"
+                           required>
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+            </div>
+            
+            <button type="submit" class="search-button" id="searchButton">
+                <i class="fas fa-magic"></i> Get Recommendations
+            </button>
+        </form>
+    </div>
+</section>
+
+<div class="container">
+    <!-- Error Message -->
+    {% if error %}
+    <div class="error-message">
+        <i class="fas fa-exclamation-circle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Recommendations -->
+    {% if data and data|length > 0 %}
+    <div class="recommendations-section">
+        <div class="recommendations-header">
+            <h2 class="recommendations-title">
+                Books Similar to <span class="user-book">{{ user_input }}</span>
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                Here are {{ data|length }} personalized recommendations based on your selection
+            </p>
+        </div>
+        
+        <div class="grid" style="gap: 2rem;">
+            {% for book in data %}
+            <div class="recommendation-card fade-in">
+                <img src="{{ book[2] if book[2] else 'https://via.placeholder.com/100x140?text=No+Image' }}" 
+                     alt="{{ book[0] }}" 
+                     class="rec-book-image"
+                     onerror="this.src='https://via.placeholder.com/100x140?text=No+Image'">
+                
+                <div class="rec-book-info">
+                    <div class="recommendation-badge">
+                        <i class="fas fa-thumbs-up"></i> Recommended
+                    </div>
+                    <h3 class="rec-book-title">{{ book[0] }}</h3>
+                    <p class="rec-book-author">by {{ book[1] }}</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Based on readers who also enjoyed "{{ user_input }}", this book offers similar themes, writing style, or genre elements.
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    {% elif not error and not user_input %}
+    <!-- How it Works Section -->
+    <div class="how-it-works">
+        <h2 class="how-title">How Our Recommendations Work</h2>
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Choose a Book</h3>
+                <p class="step-description">Start by typing the title of a book you enjoyed reading</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3 class="step-title">AI Analysis</h3>
+                <p class="step-description">Our algorithm analyzes reading patterns and book similarities</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Get Recommendations</h3>
+                <p class="step-description">Discover new books tailored to your reading preferences</p>
+            </div>
+        </div>
+    </div>
+    
+    {% elif user_input and not data %}
+    <!-- No Results -->
+    <div class="no-results">
+        <div class="no-results-icon">
+            <i class="fas fa-search"></i>
+        </div>
+        <h3>No recommendations found</h3>
+        <p>Try searching for a different book title or check your spelling.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let debounceTimer;
+    const bookInput = document.getElementById('bookInput');
+    const dropdown = document.getElementById('autocompleteDropdown');
+    const form = document.getElementById('recommendForm');
+    const searchButton = document.getElementById('searchButton');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    let selectedIndex = -1;
+
+    // Autocomplete functionality
+    bookInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        clearTimeout(debounceTimer);
+        
+        if (query.length < 2) {
+            hideDropdown();
+            return;
+        }
+        
+        debounceTimer = setTimeout(() => {
+            searchBooks(query);
+        }, 300);
+    });
+
+    // Keyboard navigation
+    bookInput.addEventListener('keydown', function(e) {
+        const items = dropdown.querySelectorAll('.autocomplete-item');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            updateSelection(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, -1);
+            updateSelection(items);
+        } else if (e.key === 'Enter') {
+            if (selectedIndex >= 0 && items[selectedIndex]) {
+                e.preventDefault();
+                selectBook(items[selectedIndex].textContent);
+            }
+        } else if (e.key === 'Escape') {
+            hideDropdown();
+        }
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.autocomplete-container')) {
+            hideDropdown();
+        }
+    });
+
+    function searchBooks(query) {
+        fetch(`/search_books?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(books => {
+                showDropdown(books);
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                hideDropdown();
+            });
+    }
+
+    function showDropdown(books) {
+        dropdown.innerHTML = '';
+        selectedIndex = -1;
+        
+        if (books.length === 0) {
+            hideDropdown();
+            return;
+        }
+        
+        books.forEach(book => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.textContent = book;
+            item.addEventListener('click', () => selectBook(book));
+            dropdown.appendChild(item);
+        });
+        
+        dropdown.style.display = 'block';
+    }
+
+    function hideDropdown() {
+        dropdown.style.display = 'none';
+        selectedIndex = -1;
+    }
+
+    function updateSelection(items) {
+        items.forEach((item, index) => {
+            item.classList.toggle('selected', index === selectedIndex);
+        });
+    }
+
+    function selectBook(bookTitle) {
+        bookInput.value = bookTitle;
+        hideDropdown();
+    }
+
+    // Form submission with loading state
+    form.addEventListener('submit', function() {
+        searchButton.innerHTML = '<div class="spinner" style="width: 20px; height: 20px;"></div> Searching...';
+        searchButton.disabled = true;
+        loadingSpinner.style.display = 'flex';
+    });
+
+    // Smooth scroll to recommendations
+    if (document.querySelector('.recommendations-section')) {
+        setTimeout(() => {
+            document.querySelector('.recommendations-section').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 100);
+    }
+
+    // Image loading animation
+    document.querySelectorAll('.rec-book-image').forEach(img => {
+        img.addEventListener('load', function() {
+            this.style.opacity = '1';
+        });
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.3s ease';
+    });
+</script>
+{% endblock %}
