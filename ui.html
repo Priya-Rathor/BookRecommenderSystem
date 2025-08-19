@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Little Belle Adventures - Book Recommendation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f2 50%, #b8dce8 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid #5fb3d4;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            text-align: center;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            color: #5fb3d4;
+            font-style: italic;
+            margin-bottom: 0.25rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo p {
+            color: #7fb3d3;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            background: #5fb3d4;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Auth Page Styles */
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-page::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="%23ffffff" opacity="0.1"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            from { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+            to { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h2 {
+            color: #5fb3d4;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #5fb3d4;
+            box-shadow: 0 0 0 3px rgba(95, 179, 212, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #5fb3d4, #4a90c2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(95, 179, 212, 0.3);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .auth-switch a {
+            color: #5fb3d4;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Guest Access */
+        .guest-access {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .guest-btn {
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .guest-btn:hover {
+            color: #5fb3d4;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .dashboard.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(95, 179, 212, 0.1), rgba(181, 203, 220, 0.1));
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: #5a6c7d;
+            margin-bottom: 2rem;
+        }
+
+        /* Search Styles */
+        .search-section {
+            background: white;
+            padding: 2rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #5fb3d4;
+            box-shadow: 0 0 0 3px rgba(95, 179, 212, 0.1);
+        }
+
+        .search-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #5fb3d4, #4a90c2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(95, 179, 212, 0.3);
+        }
+
+        .ai-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #5fb3d4;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::after {
+            left: 32px;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 80px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            padding: 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            background: #f8f9fa;
+            color: #5fb3d4;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 3rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .section-header p {
+            color: #5a6c7d;
+            font-size: 1.1rem;
+        }
+
+        /* Book Grid Styles */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .book-card:hover .book-image {
+            transform: scale(1.05);
+        }
+
+        .book-info {
+            padding: 1.5rem;
+        }
+
+        .book-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .book-author {
+            color: #5fb3d4;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .book-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating-stars {
+            color: #f39c12;
+            font-size: 1.2rem;
+        }
+
+        .rating-text {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .book-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .book-card:hover .book-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn.like {
+            background: #e74c3c;
+        }
+
+        .action-btn.recommend {
+            background: #5fb3d4;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* History Styles */
+        .history-list {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .history-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .history-info h4 {
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-info p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .history-meta {
+            color: #95a5a6;
+            font-size: 0.8rem;
+        }
+
+        /* Utility Styles */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5fb3d4;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 1rem;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #5fb3d4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 1rem;
+            color: #5fb3d4;
+        }
+
+        .error-message, .success-message {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-message {
+            background: #e74c3c;
+        }
+
+        .success-message {
+            background: #27ae60;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-up {
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Price Badge */
+        .price-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-menu {
+                gap: 1rem;
+            }
+
+            .logo h1 {
+                font-size: 2rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.5rem;
+                padding: 0 1rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Section Separators */
+        .section-separator {
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #5fb3d4, transparent);
+            margin: 2rem 0;
+        }
+
+        /* Book Category Badges */
+        .category-badge {
+            display: inline-block;
+            background: rgba(95, 179, 212, 0.1);
+            color: #5fb3d4;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 0.25rem;
+        }
+
+        /* Enhanced Book Cards */
+        .book-card-enhanced {
+            position: relative;
+            overflow: visible;
+        }
+
+        .book-card-enhanced::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, #5fb3d4, #4a90c2, #5fb3d4);
+            border-radius: 25px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .book-card-enhanced:hover::before {
+            opacity: 1;
+        }
+
+        /* Chat Widget Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5fb3d4, #4a90c2);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(95, 179, 212, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .chat-widget:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 35px rgba(95, 179, 212, 0.4);
+        }
+
+        /* Special Effects */
+        .floating-books {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-book {
+            position: absolute;
+            font-size: 2rem;
+            color: rgba(95, 179, 212, 0.1);
+            animation: floatBook 15s infinite linear;
+        }
+
+        @keyframes floatBook {
+            from {
+                transform: translateY(100vh) rotate(0deg);
+            }
+            to {
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Books Background -->
+    <div class="floating-books" id="floatingBooks"></div>
+
+    <!-- Auth Page -->
+    <div class="auth-page" id="authPage">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>Little Belle Adventures</h2>
+                <p>Discover Your Next Great Read</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="auth-btn">Login</button>
+                <div class="auth-switch">
+                    <p>Don't have an account? <a href="#" id="showRegister">Register here</a></p>
+                </div>
+                <div class="guest-access">
+                    <a href="#" id="guestAccess" class="guest-btn">Continue as Guest</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display: none;">
+                <div class="form-group">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <button type="submit" class="auth-btn">Register</button>
+                <div class="auth-switch">
+                    <p>Already have an account? <a href="#" id="showLogin">Login here</a></p>
+                </div>
+                <div class="guest-access">
+                    <a href="#" id="guestAccessRegister" class="guest-btn">Continue as Guest</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <h1>Little Belle Adventures</h1>
+                    <p>A Book Discovery Journey</p>
+                </div>
+                <nav>
+                    <ul class="nav-menu">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#books">Books</a></li>
+                        <li><a href="#recommendations" class="auth-required">For You</a></li>
+                        <li><a href="#history" class="auth-required">History</a></li>
+                    </ul>
+                </nav>
+                <div class="user-info">
+                    <span>Welcome, <span id="currentUser">Guest</span>!</span>
+                    <button class="logout-btn" id="logoutBtn" style="display: none;">Logout</button>
+                    <button class="logout-btn" id="loginPrompt" style="display: inline-block;">Login</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="hero-content">
+                <h1>Discover Your Next Adventure</h1>
+                <p>Let AI guide you to the perfect book for your reading journey</p>
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search for books, authors, or describe what you're looking for...">
+                    <button class="search-btn" id="searchBtn">Search</button>
+                    <div class="search-suggestions" id="searchSuggestions"></div>
+                </div>
+                <div class="ai-toggle">
+                    <span>AI-Powered Search</span>
+                    <div class="toggle-switch active" id="aiToggle"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Results -->
+        <section class="content-section" id="searchResults" style="display: none;">
+            <div class="section-header">
+                <h2>Search Results</h2>
+                <p id="searchResultsSubtitle">Your personalized book discoveries</p>
+            </div>
+            <div class="books-grid" id="searchResultsGrid"></div>
+        </section>
+
+        <!-- Popular Books -->
+        <section class="content-section" id="books">
+            <div class="section-header">
+                <h2>Our Latest Adventures</h2>
+                <p>Trending books loved by our community</p>
+            </div>
+            <div class="books-grid" id="popularBooksGrid"></div>
+        </section>
+
+        <div class="section-separator"></div>
+
+        <!-- Personalized Recommendations -->
+        <section class="content-section auth-required" id="recommendations">
+            <div class="section-header">
+                <h2>Recommended For You</h2>
+                <p>Books curated based on your reading preferences</p>
+            </div>
+            <div class="books-grid" id="recommendationsGrid"></div>
+        </section>
+
+        <div class="section-separator auth-required"></div>
+
+        <!-- User History -->
+        <section class="content-section auth-required" id="history">
+            <div class="section-header">
+                <h2>Your Reading Journey</h2>
+                <p>Track your book discoveries and interactions</p>
+            </div>
+            <div class="history-list" id="historyList"></div>
+        </section>
+    </div>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget" onclick="showSuccess('Chat feature coming soon!')">
+        💬
+    </div>
+
+    <script>
+        // Debug logging function
+        const debugLog = (message, type = 'info') => {
+            const timestamp = new Date().toISOString();
+            const colors = {
+                info: '#3498db',
+                success: '#27ae60',
+                warning: '#f39c12',
+                error: '#e74c3c'
+            };
+            console.log(`%c[${timestamp}] ${message}`, `color: ${colors[type]}; font-weight: bold;`);
+        };
+
+        debugLog('=== BOOK RECOMMENDATION SYSTEM STARTING ===', 'info');
+
+        // API Configuration
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        debugLog(`API Base URL: ${API_BASE_URL}`, 'info');
+        
+        // Global state
+        let currentUser = null;
+        let authToken = null;
+        let aiSearchEnabled = true;
+        let searchTimeout = null;
+        let isGuestMode = false;
+
+        debugLog('Global state initialized', 'success');
+
+        // Mock data for offline/guest mode
+        const mockBooks = [
+            {
+                title: "The Midnight Library",
+                author: "Matt Haig",
+                avg_rating: 4.2,
+                price: "$14.99",
+                image_url: null
+            },
+            {
+                title: "Where the Crawdads Sing",
+                author: "Delia Owens",
+                avg_rating: 4.5,
+                price: "$16.99",
+                image_url: null
+            },
+            {
+                title: "The Seven Husbands of Evelyn Hugo",
+                author: "Taylor Jenkins Reid",
+                avg_rating: 4.3,
+                price: "$15.99",
+                image_url: null
+            },
+            {
+                title: "Educated",
+                author: "Tara Westover",
+                avg_rating: 4.4,
+                price: "$17.99",
+                image_url: null
+            },
+            {
+                title: "The Silent Patient",
+                author: "Alex Michaelides",
+                avg_rating: 4.1,
+                price: "$13.99",
+                image_url: null
+            },
+            {
+                title: "Atomic Habits",
+                author: "James Clear",
+                avg_rating: 4.6,
+                price: "$18.99",
+                image_url: null
+            }
+        ];
+
+        // DOM Elements
+        const authPage = document.getElementById('authPage');
+        const dashboard = document.getElementById('dashboard');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const guestAccess = document.getElementById('guestAccess');
+        const guestAccessRegister = document.getElementById('guestAccessRegister');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const currentUserSpan = document.getElementById('currentUser');
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('searchSuggestions');
+        const aiToggle = document.getElementById('aiToggle');
+        const searchBtn = document.getElementById('searchBtn');
+
+        debugLog('DOM elements loaded', 'success');
+
+        // Create floating books animation
+        const createFloatingBooks = () => {
+            const floatingBooks = document.getElementById('floatingBooks');
+            const bookEmojis = ['📚', '📖', '📙', '📘', '📗', '📕'];
+            
+            for (let i = 0; i < 10; i++) {
+                const book = document.createElement('div');
+                book.className = 'floating-book';
+                book.textContent = bookEmojis[Math.floor(Math.random() * bookEmojis.length)];
+                book.style.left = Math.random() * 100 + '%';
+                book.style.animationDelay = Math.random() * 15 + 's';
+                book.style.animationDuration = (15 + Math.random() * 10) + 's';
+                floatingBooks.appendChild(book);
+            }
+        };
+
+        // Utility Functions
+        const showError = (message) => {
+            debugLog(`ERROR: ${message}`, 'error');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message slide-up';
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => errorDiv.remove(), 5000);
+        };
+
+        const showSuccess = (message) => {
+            debugLog(`SUCCESS: ${message}`, 'success');
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message slide-up';
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+            setTimeout(() => successDiv.remove(), 3000);
+        };
+
+        const createLoadingSpinner = () => {
+            debugLog('Creating loading spinner', 'info');
+            return '<div class="loading"><div class="spinner"></div>Loading...</div>';
+        };
+
+        const formatDate = (dateString) => {
+            try {
+                debugLog(`Formatting date: ${dateString}`, 'info');
+                const result = new Date(dateString).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                debugLog(`Formatted date result: ${result}`, 'success');
+                return result;
+            } catch (error) {
+                debugLog(`Date formatting error: ${error.message}`, 'error');
+                return 'Invalid Date';
+            }
+        };
+
+        const generateStars = (rating) => {
+            try {
+                debugLog(`Generating stars for rating: ${rating}`, 'info');
+                
+                if (rating === null || rating === undefined || isNaN(rating)) {
+                    debugLog(`Invalid rating value: ${rating}`, 'warning');
+                    rating = 0;
+                }
+                
+                rating = Math.max(0, Math.min(5, Number(rating)));
+                debugLog(`Normalized rating: ${rating}`, 'info');
+                
+                const fullStars = Math.floor(rating);
+                const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+                const emptyStars = Math.max(0, 5 - fullStars - halfStar);
+                
+                debugLog(`Stars breakdown - Full: ${fullStars}, Half: ${halfStar}, Empty: ${emptyStars}`, 'info');
+                
+                const fullStarsStr = '★'.repeat(Math.max(0, fullStars));
+                const halfStarStr = halfStar ? '☆' : '';
+                const emptyStarsStr = '☆'.repeat(Math.max(0, emptyStars));
+                
+                const result = fullStarsStr + halfStarStr + emptyStarsStr;
+                debugLog(`Generated stars: ${result}`, 'success');
+                
+                return result;
+            } catch (error) {
+                debugLog(`Error generating stars: ${error.message}`, 'error');
+                return '☆☆☆☆☆';
+            }
+        };
+
+        // UI State Management
+        const updateUIForAuthState = (isAuthenticated) => {
+            debugLog(`Updating UI for auth state: ${isAuthenticated}`, 'info');
+            
+            const authRequiredElements = document.querySelectorAll('.auth-required');
+            authRequiredElements.forEach(element => {
+                if (isAuthenticated) {
+                    element.classList.remove('hidden');
+                } else {
+                    element.classList.add('hidden');
+                }
+            });
+
+            if (isAuthenticated) {
+                logoutBtn.style.display = 'inline-block';
+                loginPrompt.style.display = 'none';
+                currentUserSpan.textContent = currentUser || 'User';
+            } else {
+                logoutBtn.style.display = 'none';
+                loginPrompt.style.display = 'inline-block';
+                currentUserSpan.textContent = isGuestMode ? 'Guest' : 'User';
+            }
+        };
+
+        // API Functions
+        const apiCall = async (endpoint, options = {}) => {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+                }
+            };
+
+            debugLog(`API Call: ${options.method || 'GET'} ${url}`, 'info');
+
+            try {
+                const response = await fetch(url, { ...defaultOptions, ...options });
+                debugLog(`Response status: ${response.status}`, 'info');
+                
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                    debugLog(`Response data keys: ${Object.keys(data)}`, 'info');
+                } else {
+                    const text = await response.text();
+                    debugLog(`Non-JSON response: ${text}`, 'error');
+                    throw new Error('Server returned non-JSON response');
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.detail || data.message || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return data;
+            } catch (error) {
+                debugLog(`API call failed: ${error.message}`, 'error');
+                
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    throw new Error('Cannot connect to server. Using offline mode.');
+                }
+                
+                throw error;
+            }
+        };
+
+        // Authentication Functions
+        const register = async (username, email, password) => {
+            debugLog(`Attempting to register user: ${username}`, 'info');
+            return await apiCall('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ username, email, password })
+            });
+        };
+
+        const login = async (username, password) => {
+            debugLog(`Attempting to login user: ${username}`, 'info');
+            const data = await apiCall('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+            
+            authToken = data.access_token;
+            currentUser = data.username;
+            isGuestMode = false;
+            
+            debugLog(`Login successful for user: ${currentUser}`, 'success');
+            return data;
+        };
+
+        const logout = () => {
+            debugLog('Logging out user', 'info');
+            authToken = null;
+            currentUser = null;
+            isGuestMode = false;
+            showDashboard(false);
+        };
+
+        const enterGuestMode = () => {
+            debugLog('Entering guest mode', 'info');
+            isGuestMode = true;
+            currentUser = null;
+            authToken = null;
+            showDashboard(true);
+        };
+
+        // UI Functions
+        const showDashboard = (show) => {
+            debugLog(`Showing dashboard: ${show}`, 'info');
+            if (show) {
+                authPage.style.display = 'none';
+                dashboard.classList.add('active');
+                updateUIForAuthState(!!authToken);
+                loadDashboardData();
+            } else {
+                authPage.style.display = 'flex';
+                dashboard.classList.remove('active');
+                isGuestMode = false;
+            }
+        };
+
+        const createBookCard = (book, showActions = true) => {
+            try {
+                debugLog(`Creating book card for: ${book?.title || 'Unknown Title'}`, 'info');
+                
+                if (!book) {
+                    debugLog('Book object is null or undefined', 'error');
+                    return '<div class="error-message">Invalid book data</div>';
+                }
+                
+                const title = book.title || 'Unknown Title';
+                const author = book.author || 'Unknown Author';
+                const rating = book.avg_rating || book.similarity_score || 4.0;
+                const price = book.price || `${(Math.random() * 10 + 10).toFixed(2)}`;
+                const imageUrl = book.image_url && book.image_url !== 'https://via.placeholder.com/150x200' 
+                    ? book.image_url 
+                    : `https://picsum.photos/280/350?random=${Math.floor(Math.random() * 1000)}`;
+
+                debugLog(`Book card data - Title: ${title}, Author: ${author}, Rating: ${rating}`, 'info');
+
+                const cardHtml = `
+                    <div class="book-card book-card-enhanced fade-in" data-title="${title}" data-author="${author}">
+                        <div class="price-badge">${price}</div>
+                        <img src="${imageUrl}" alt="${title}" class="book-image" 
+                             onerror="this.src='https://via.placeholder.com/280x350/5fb3d4/ffffff?text=${encodeURIComponent(title.substring(0, 2))}'">
+                        ${showActions && authToken ? `
+                            <div class="book-actions">
+                                <button class="action-btn like" onclick="likeBook('${title.replace(/'/g, "\\'")}', '${author.replace(/'/g, "\\'")}')">♥</button>
+                                <button class="action-btn recommend" onclick="getRecommendations('${title.replace(/'/g, "\\'")}')">→</button>
+                            </div>
+                        ` : ''}
+                        <div class="book-info">
+                            <h3 class="book-title">${title}</h3>
+                            <p class="book-author">by ${author}</p>
+                            <div class="book-rating">
+                                <span class="rating-stars">${generateStars(rating)}</span>
+                                <span class="rating-text">${Number(rating).toFixed(1)}</span>
+                                ${book.num_ratings ? `<span class="rating-text">(${book.num_ratings} reviews)</span>` : ''}
+                            </div>
+                            <div class="book-categories">
+                                <span class="category-badge">Adventure</span>
+                                <span class="category-badge">Fiction</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                debugLog('Book card created successfully', 'success');
+                return cardHtml;
+            } catch (error) {
+                debugLog(`Error creating book card: ${error.message}`, 'error');
+                return '<div class="error-message">Error displaying book</div>';
+            }
+        };
+
+        // Data Loading Functions with optimization
+        const loadPopularBooks = async () => {
+            try {
+                debugLog('=== LOADING POPULAR BOOKS ===', 'info');
+                const grid = document.getElementById('popularBooksGrid');
+                
+                if (!grid) {
+                    debugLog('Popular books grid element not found', 'error');
+                    return;
+                }
+                
+                grid.innerHTML = createLoadingSpinner();
+                debugLog('Loading spinner added to popular books grid', 'info');
+                
+                let booksToShow = [];
+                
+                try {
+                    const data = await apiCall('/books/popular');
+                    debugLog(`Popular books API response received`, 'success');
+                    
+                    if (data.books && Array.isArray(data.books)) {
+                        booksToShow = data.books.slice(0, 6); // Limit to 6 books
+                    } else if (Array.isArray(data)) {
+                        booksToShow = data.slice(0, 6);
+                    }
+                } catch (apiError) {
+                    debugLog(`API failed, using mock data: ${apiError.message}`, 'warning');
+                    booksToShow = mockBooks.slice(0, 6);
+                }
+                
+                if (booksToShow.length > 0) {
+                    debugLog(`Processing ${booksToShow.length} books`, 'info');
+                    
+                    const bookCards = [];
+                    for (let i = 0; i < booksToShow.length; i++) {
+                        const book = booksToShow[i];
+                        debugLog(`Processing book ${i + 1}: ${book?.title || 'No title'}`, 'info');
+                        
+                        try {
+                            const cardHtml = createBookCard(book);
+                            bookCards.push(cardHtml);
+                            debugLog(`Book ${i + 1} processed successfully`, 'success');
+                        } catch (bookError) {
+                            debugLog(`Error processing book ${i + 1}: ${bookError.message}`, 'error');
+                            continue;
+                        }
+                    }
+                    
+                    if (bookCards.length > 0) {
+                        grid.innerHTML = bookCards.join('');
+                        debugLog(`Successfully loaded ${bookCards.length} popular books`, 'success');
+                    } else {
+                        grid.innerHTML = '<div class="error-message">No valid books to display</div>';
+                        debugLog('No valid book cards created', 'warning');
+                    }
+                } else {
+                    grid.innerHTML = '<div class="empty-state"><h3>No popular books available</h3><p>Check back later for trending books</p></div>';
+                    debugLog('No books found', 'warning');
+                }
+            } catch (error) {
+                debugLog(`=== POPULAR BOOKS ERROR ===`, 'error');
+                debugLog(`Error: ${error.message}`, 'error');
+                
+                // Fallback to mock data
+                const grid = document.getElementById('popularBooksGrid');
+                if (grid) {
+                    const mockCards = mockBooks.slice(0, 6).map(book => createBookCard(book));
+                    grid.innerHTML = mockCards.join('');
+                    debugLog('Loaded mock popular books as fallback', 'warning');
+                }
+            }
+        };
+
+        const loadPersonalizedRecommendations = async () => {
+            if (!authToken) {
+                debugLog('No auth token, skipping personalized recommendations', 'info');
+                const grid = document.getElementById('recommendationsGrid');
+                if (grid) {
+                    grid.innerHTML = '<div class="empty-state"><h3>Login Required</h3><p>Please login to see personalized recommendations</p></div>';
+                }
+                return;
+            }
+
+            try {
+                debugLog('=== LOADING PERSONALIZED RECOMMENDATIONS ===', 'info');
+                const grid = document.getElementById('recommendationsGrid');
+                
+                if (!grid) {
+                    debugLog('Recommendations grid element not found', 'error');
+                    return;
+                }
+                
+                grid.innerHTML = createLoadingSpinner();
+                debugLog('Loading spinner added to recommendations grid', 'info');
+                
+                const data = await apiCall('/user/recommendations');
+                debugLog(`Recommendations API response received`, 'success');
+                
+                let booksArray = [];
+                if (data.books && Array.isArray(data.books)) {
+                    booksArray = data.books.slice(0, 4); // Limit to 4 books
+                } else if (data.recommendations && Array.isArray(data.recommendations)) {
+                    booksArray = data.recommendations.slice(0, 4);
+                } else if (Array.isArray(data)) {
+                    booksArray = data.slice(0, 4);
+                }
+                
+                if (booksArray.length > 0) {
+                    debugLog(`Processing ${booksArray.length} recommended books`, 'info');
+                    
+                    const bookCards = [];
+                    for (let i = 0; i < booksArray.length; i++) {
+                        const book = booksArray[i];
+                        debugLog(`Processing recommendation ${i + 1}: ${book?.title || 'No title'}`, 'info');
+                        
+                        try {
+                            const cardHtml = createBookCard(book);
+                            bookCards.push(cardHtml);
+                            debugLog(`Recommendation ${i + 1} processed successfully`, 'success');
+                        } catch (bookError) {
+                            debugLog(`Error processing recommendation ${i + 1}: ${bookError.message}`, 'error');
+                            continue;
+                        }
+                    }
+                    
+                    if (bookCards.length > 0) {
+                        grid.innerHTML = bookCards.join('');
+                        debugLog(`Successfully loaded ${bookCards.length} recommendations`, 'success');
+                    } else {
+                        grid.innerHTML = '<div class="error-message">No valid recommendations to display</div>';
+                        debugLog('No valid recommendation cards created', 'warning');
+                    }
+                } else {
+                    grid.innerHTML = '<div class="empty-state"><h3>No recommendations yet</h3><p>Start exploring books to get personalized recommendations</p></div>';
+                    debugLog('No recommendations found in response', 'info');
+                }
+            } catch (error) {
+                debugLog(`=== RECOMMENDATIONS ERROR ===`, 'error');
+                debugLog(`Error: ${error.message}`, 'error');
+                
+                const grid = document.getElementById('recommendationsGrid');
+                if (grid) {
+                    grid.innerHTML = '<div class="empty-state"><h3>No recommendations available</h3><p>Login and interact with books to get recommendations</p></div>';
+                }
+            }
+        };
+
+        const loadUserHistory = async () => {
+            if (!authToken) {
+                debugLog('No auth token, skipping user history', 'info');
+                const historyList = document.getElementById('historyList');
+                if (historyList) {
+                    historyList.innerHTML = '<div class="empty-state"><h3>Login Required</h3><p>Please login to see your reading history</p></div>';
+                }
+                return;
+            }
+
+            try {
+                debugLog('=== LOADING USER HISTORY ===', 'info');
+                const historyList = document.getElementById('historyList');
+                
+                if (!historyList) {
+                    debugLog('History list element not found', 'error');
+                    return;
+                }
+                
+                historyList.innerHTML = createLoadingSpinner();
+                debugLog('Loading spinner added to history list', 'info');
+                
+                const data = await apiCall('/user/history');
+                debugLog(`History API response received`, 'success');
+                
+                if (data.history && Array.isArray(data.history) && data.history.length > 0) {
+                    // Limit to recent 10 items
+                    const recentHistory = data.history.slice(0, 10);
+                    debugLog(`Processing ${recentHistory.length} history items`, 'info');
+                    
+                    const historyItems = recentHistory.map((item, index) => {
+                        debugLog(`Processing history item ${index + 1}: ${item?.book_title || 'No title'}`, 'info');
+                        
+                        try {
+                            return `
+                                <div class="history-item">
+                                    <div class="history-info">
+                                        <h4>${item.book_title || 'Unknown Title'}</h4>
+                                        <p>${item.author || 'Unknown Author'} • ${item.interaction_type || 'Unknown'}${item.rating ? ` • Rated ${item.rating}/5` : ''}</p>
+                                    </div>
+                                    <div class="history-meta">
+                                        ${formatDate(item.created_at)}
+                                    </div>
+                                </div>
+                            `;
+                        } catch (itemError) {
+                            debugLog(`Error processing history item ${index + 1}: ${itemError.message}`, 'error');
+                            return '';
+                        }
+                    }).filter(item => item !== '');
+                    
+                    if (historyItems.length > 0) {
+                        historyList.innerHTML = historyItems.join('');
+                        debugLog(`Successfully loaded ${historyItems.length} history items`, 'success');
+                    } else {
+                        historyList.innerHTML = '<div class="error-message">No valid history items to display</div>';
+                        debugLog('No valid history items created', 'warning');
+                    }
+                } else {
+                    historyList.innerHTML = '<div class="empty-state"><h3>No history yet</h3><p>Your book interactions will appear here</p></div>';
+                    debugLog('No history found in response', 'info');
+                }
+            } catch (error) {
+                debugLog(`=== HISTORY ERROR ===`, 'error');
+                debugLog(`Error: ${error.message}`, 'error');
+                
+                const historyList = document.getElementById('historyList');
+                if (historyList) {
+                    historyList.innerHTML = '<div class="empty-state"><h3>History unavailable</h3><p>Login to view your reading history</p></div>';
+                }
+            }
+        };
+
+        const loadDashboardData = async () => {
+            debugLog('=== LOADING DASHBOARD DATA ===', 'info');
+            debugLog(`Current user: ${currentUser}`, 'info');
+            debugLog(`Auth token exists: ${!!authToken}`, 'info');
+            debugLog(`Guest mode: ${isGuestMode}`, 'info');
+            
+            // Always load popular books (works for both guest and authenticated users)
+            await loadPopularBooks();
+            
+            // Only load user-specific data if authenticated
+            if (authToken) {
+                debugLog('Loading user-specific data...', 'info');
+                await Promise.all([
+                    loadPersonalizedRecommendations(),
+                    loadUserHistory()
+                ]);
+                debugLog('All dashboard data loading completed', 'success');
+            } else {
+                debugLog('Guest mode - skipping user-specific data', 'info');
+                // Show empty states for authenticated-only sections
+                loadPersonalizedRecommendations();
+                loadUserHistory();
+            }
+        };
+
+        // Enhanced Search Functions
+        const searchBooks = async (query, useAI = true) => {
+            try {
+                debugLog(`=== SEARCHING BOOKS ===`, 'info');
+                debugLog(`Query: "${query}", AI: ${useAI}, Guest Mode: ${isGuestMode}`, 'info');
+                
+                const resultsSection = document.getElementById('searchResults');
+                const resultsGrid = document.getElementById('searchResultsGrid');
+                const resultsSubtitle = document.getElementById('searchResultsSubtitle');
+                
+                resultsSection.style.display = 'block';
+                resultsGrid.innerHTML = createLoadingSpinner();
+                
+                let searchResults = [];
+                
+                try {
+                    const data = await apiCall('/books/smart-search', {
+                        method: 'POST',
+                        body: JSON.stringify({ 
+                            query: query,
+                            use_gemini: useAI 
+                        })
+                    });
+                    
+                    debugLog(`Search results received from API`, 'success');
+                    
+                    if (data.results && data.results.length > 0) {
+                        searchResults = data.results.slice(0, 12); // Limit search results to 12
+                        resultsSubtitle.textContent = `Found ${searchResults.length} results using ${data.method || 'search'} method`;
+                    }
+                } catch (apiError) {
+                    debugLog(`Search API failed, using mock search: ${apiError.message}`, 'warning');
+                    
+                    // Mock search functionality for offline/guest mode
+                    const mockSearchResults = mockBooks.filter(book => 
+                        book.title.toLowerCase().includes(query.toLowerCase()) ||
+                        book.author.toLowerCase().includes(query.toLowerCase())
+                    );
+                    
+                    if (mockSearchResults.length === 0 && query.length > 0) {
+                        // If no direct matches, return random books as suggestions
+                        searchResults = mockBooks.slice(0, 4);
+                        resultsSubtitle.textContent = `Showing suggested books (offline mode)`;
+                    } else {
+                        searchResults = mockSearchResults.slice(0, 8);
+                        resultsSubtitle.textContent = `Found ${searchResults.length} results (offline mode)`;
+                    }
+                }
+                
+                if (searchResults.length > 0) {
+                    const bookCards = searchResults.map(book => createBookCard(book, true));
+                    resultsGrid.innerHTML = bookCards.join('');
+                    debugLog(`Successfully displayed ${searchResults.length} search results`, 'success');
+                } else {
+                    resultsGrid.innerHTML = '<div class="empty-state"><h3>No results found</h3><p>Try adjusting your search terms</p></div>';
+                    resultsSubtitle.textContent = 'No results found';
+                    debugLog('No search results found', 'info');
+                }
+                
+                // Log interaction only if authenticated
+                if (authToken) {
+                    logInteraction(query, '', 'smart_search');
+                }
+                
+                // Smooth scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                debugLog(`=== SEARCH ERROR ===`, 'error');
+                debugLog(`Error: ${error.message}`, 'error');
+                showError(`Search failed: ${error.message}`);
+                document.getElementById('searchResultsGrid').innerHTML = `<div class="error-message">Search failed: ${error.message}</div>`;
+            }
+        };
+
+        const getSuggestions = async (query) => {
+            if (!query || query.length < 2) {
+                searchSuggestions.style.display = 'none';
+                return;
+            }
+            
+            try {
+                debugLog(`Getting suggestions for: "${query}"`, 'info');
+                
+                let suggestions = [];
+                
+                try {
+                    const data = await apiCall(`/books/search?q=${encodeURIComponent(query)}`);
+                    if (data.results && data.results.length > 0) {
+                        suggestions = data.results.slice(0, 5); // Limit suggestions
+                    }
+                } catch (apiError) {
+                    debugLog(`Suggestions API failed, using mock: ${apiError.message}`, 'warning');
+                    // Mock suggestions
+                    suggestions = mockBooks
+                        .filter(book => 
+                            book.title.toLowerCase().includes(query.toLowerCase()) ||
+                            book.author.toLowerCase().includes(query.toLowerCase())
+                        )
+                        .map(book => book.title)
+                        .slice(0, 5);
+                }
+                
+                if (suggestions.length > 0) {
+                    searchSuggestions.innerHTML = suggestions.map(title => 
+                        `<div class="suggestion-item" onclick="selectSuggestion('${title.replace(/'/g, "\\'")}')">${title}</div>`
+                    ).join('');
+                    searchSuggestions.style.display = 'block';
+                    debugLog(`Showed ${suggestions.length} suggestions`, 'success');
+                } else {
+                    searchSuggestions.style.display = 'none';
+                    debugLog('No suggestions found', 'info');
+                }
+            } catch (error) {
+                debugLog(`Failed to get suggestions: ${error.message}`, 'error');
+                searchSuggestions.style.display = 'none';
+            }
+        };
+
+        const selectSuggestion = (title) => {
+            debugLog(`Selected suggestion: ${title}`, 'info');
+            searchInput.value = title;
+            searchSuggestions.style.display = 'none';
+            searchBooks(title, aiSearchEnabled);
+        };
+
+        // Book Interaction Functions
+        const likeBook = async (title, author) => {
+            if (!authToken) {
+                showError('Please login to like books');
+                return;
+            }
+
+            try {
+                debugLog(`Liking book: ${title} by ${author}`, 'info');
+                await apiCall('/user/interaction', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        book_title: title,
+                        author: author,
+                        interaction_type: 'like'
+                    })
+                });
+                showSuccess(`Added "${title}" to your liked books!`);
+                loadPersonalizedRecommendations();
+                loadUserHistory();
+                debugLog(`Successfully liked book: ${title}`, 'success');
+            } catch (error) {
+                debugLog(`Failed to like book: ${error.message}`, 'error');
+                showError('Failed to like book');
+            }
+        };
+
+        const getRecommendations = async (title) => {
+            try {
+                debugLog(`Getting recommendations for: "${title}"`, 'info');
+                
+                const resultsSection = document.getElementById('searchResults');
+                const resultsGrid = document.getElementById('searchResultsGrid');
+                const resultsSubtitle = document.getElementById('searchResultsSubtitle');
+                
+                resultsSection.style.display = 'block';
+                resultsGrid.innerHTML = createLoadingSpinner();
+                
+                let recommendations = [];
+                
+                try {
+                    const data = await apiCall('/books/recommend', {
+                        method: 'POST',
+                        body: JSON.stringify({ book_title: title })
+                    });
+                    
+                    debugLog(`Recommendation response received`, 'success');
+                    
+                    if (data.recommendations && data.recommendations.length > 0) {
+                        recommendations = data.recommendations.slice(0, 8); // Limit recommendations
+                        resultsSubtitle.textContent = `Recommendations based on "${data.based_on || title}"`;
+                    }
+                } catch (apiError) {
+                    debugLog(`Recommendations API failed, using mock: ${apiError.message}`, 'warning');
+                    // Mock recommendations - exclude the selected book
+                    recommendations = mockBooks.filter(book => book.title !== title).slice(0, 4);
+                    resultsSubtitle.textContent = `Similar books to "${title}" (offline mode)`;
+                }
+                
+                if (recommendations.length > 0) {
+                    const bookCards = recommendations.map(book => createBookCard(book));
+                    resultsGrid.innerHTML = bookCards.join('');
+                    debugLog(`Successfully displayed ${recommendations.length} recommendations`, 'success');
+                } else {
+                    resultsGrid.innerHTML = '<div class="empty-state"><h3>No recommendations found</h3><p>Try selecting another book</p></div>';
+                    debugLog('No recommendations found', 'info');
+                }
+                
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                debugLog(`Failed to get recommendations: ${error.message}`, 'error');
+                showError(`Failed to get recommendations: ${error.message}`);
+                document.getElementById('searchResultsGrid').innerHTML = `<div class="error-message">Failed to get recommendations: ${error.message}</div>`;
+            }
+        };
+
+        const logInteraction = async (title, author, type, rating = null) => {
+            if (!authToken) {
+                debugLog('No auth token, skipping interaction logging', 'info');
+                return;
+            }
+
+            try {
+                await apiCall('/user/interaction', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        book_title: title,
+                        author: author,
+                        interaction_type: type,
+                        rating: rating
+                    })
+                });
+                debugLog(`Logged interaction: ${type} for ${title}`, 'success');
+            } catch (error) {
+                debugLog(`Failed to log interaction: ${error.message}`, 'error');
+            }
+        };
+
+        // Event Listeners
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                await login(username, password);
+                showSuccess('Login successful!');
+                showDashboard(true);
+            } catch (error) {
+                showError(error.message || 'Login failed');
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!username || !email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                await register(username, email, password);
+                showSuccess('Registration successful! Please login.');
+                showLogin.click();
+            } catch (error) {
+                showError(error.message || 'Registration failed');
+            }
+        });
+
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+
+        // Guest access handlers
+        guestAccess.addEventListener('click', (e) => {
+            e.preventDefault();
+            enterGuestMode();
+        });
+
+        guestAccessRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            enterGuestMode();
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            logout();
+        });
+
+        loginPrompt.addEventListener('click', () => {
+            showDashboard(false);
+        });
+
+        aiToggle.addEventListener('click', () => {
+            aiSearchEnabled = !aiSearchEnabled;
+            aiToggle.classList.toggle('active', aiSearchEnabled);
+            debugLog(`AI search toggled: ${aiSearchEnabled}`, 'info');
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                getSuggestions(e.target.value);
+            }, 300);
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchBtn.click();
+            }
+        });
+
+        searchInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                searchSuggestions.style.display = 'none';
+            }, 200);
+        });
+
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                searchBooks(query, aiSearchEnabled);
+            } else {
+                showError('Please enter a search term');
+            }
+        });
+
+        // Click outside suggestions to hide
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-box')) {
+                searchSuggestions.style.display = 'none';
+            }
+        });
+
+        // Book card click handlers
+        document.addEventListener('click', (e) => {
+            const bookCard = e.target.closest('.book-card');
+            if (bookCard && !e.target.closest('.book-actions')) {
+                const title = bookCard.dataset.title;
+                const author = bookCard.dataset.author;
+                if (authToken) {
+                    logInteraction(title, author, 'view');
+                }
+            }
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const target = document.getElementById(targetId);
+                
+                // Check if target requires authentication
+                if (this.classList.contains('auth-required') && !authToken) {
+                    showError('Please login to access this feature');
+                    return;
+                }
+                
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Initialize App
+        const initApp = () => {
+            debugLog('=== INITIALIZING APP ===', 'info');
+            
+            // Create floating books animation
+            createFloatingBooks();
+            
+            // Start with auth page
+            showDashboard(false);
+            debugLog('App initialized, showing auth page', 'info');
+        };
+
+        // Start the application
+        document.addEventListener('DOMContentLoaded', () => {
+            debugLog('DOM loaded, starting application', 'info');
+            initApp();
+        });
+
+        // Add some sample data for demonstration if backend is not available
+        window.addEventListener('load', () => {
+            // Add a delay to show the beautiful loading animations
+            setTimeout(() => {
+                debugLog('Application fully loaded', 'success');
+            }, 1000);
+        });
+
+        // Performance optimizations
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        };
+
+        // Optimized search with debouncing
+        const debouncedSearch = debounce((query) => {
+            if (query.trim()) {
+                getSuggestions(query);
+            }
+        }, 300);
+
+        // Replace the existing input event listener with debounced version
+        searchInput.removeEventListener('input', getSuggestions);
+        searchInput.addEventListener('input', (e) => {
+            debouncedSearch(e.target.value);
+        });
+
+        // Intersection Observer for lazy loading (performance optimization)
+        const setupIntersectionObserver = () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
+
+            // Observe all book cards
+            document.querySelectorAll('.book-card').forEach(card => {
+                observer.observe(card);
+            });
+        };
+
+        // Error boundary for better error handling
+        window.addEventListener('error', (e) => {
+            debugLog(`Global error: ${e.error?.message || e.message}`, 'error');
+            console.error('Global error:', e.error || e);
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            debugLog(`Unhandled promise rejection: ${e.reason}`, 'error');
+            console.error('Unhandled promise rejection:', e.reason);
+        });
+    </script>
+</body>
+</html>
