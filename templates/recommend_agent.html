@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Book Recommendations</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .search-section {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 50px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .search-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c53030;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #fc8181;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .results-section {
+            margin-top: 2rem;
+        }
+
+        .results-header {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .results-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .query-display {
+            background: rgba(255,255,255,0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .suggestion-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .suggestion-card h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .book-icon {
+            color: #667eea;
+            font-size: 1.3rem;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            padding: 3rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .example-queries {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .example-queries h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .example-queries ul {
+            list-style: none;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .example-queries li {
+            margin-bottom: 0.3rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .example-queries li:hover {
+            color: #667eea;
+        }
+
+        .example-queries li::before {
+            content: "💡 ";
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .search-section {
+                padding: 1.5rem;
+            }
+            
+            .suggestions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> AI Book Recommendations</h1>
+            <p class="subtitle">Describe what you're looking for and let AI find the perfect books</p>
+            <span class="ai-badge">
+                <i class="fas fa-sparkles"></i> Powered by OpenAI GPT-4
+            </span>
+        </div>
+
+        <div class="search-section">
+            <form class="search-form" method="POST" id="searchForm">
+                <div class="input-group">
+                    <label for="user_input">
+                        <i class="fas fa-comment-dots"></i> Describe what kind of book you're looking for:
+                    </label>
+                    <textarea 
+                        id="user_input" 
+                        name="user_input" 
+                        class="search-input" 
+                        placeholder="e.g., 'I want a thrilling mystery set in Victorian London' or 'Looking for books about personal growth and mindfulness' or 'Science fiction with strong female protagonists'"
+                        required
+                    >{% if query %}{{ query }}{% endif %}</textarea>
+                </div>
+                
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <i class="fas fa-magic"></i>
+                    <span class="btn-text">Get AI Recommendations</span>
+                    <div class="loading-spinner"></div>
+                </button>
+
+                <div class="example-queries">
+                    <h4>💡 Try these example queries:</h4>
+                    <ul>
+                        <li onclick="fillQuery('Books about entrepreneurship and startup success stories')">Books about entrepreneurship and startup success stories</li>
+                        <li onclick="fillQuery('Fantasy novels with magic systems and epic quests')">Fantasy novels with magic systems and epic quests</li>
+                        <li onclick="fillQuery('Historical fiction set during World War II')">Historical fiction set during World War II</li>
+                        <li onclick="fillQuery('Self-help books for improving productivity and habits')">Self-help books for improving productivity and habits</li>
+                        <li onclick="fillQuery('Mystery thrillers with psychological twists')">Mystery thrillers with psychological twists</li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if query %}
+            <div class="results-section">
+                <div class="results-header">
+                    <h2><i class="fas fa-lightbulb"></i> AI Recommendations</h2>
+                    <div class="query-display">
+                        <strong>Your request:</strong> "{{ query }}"
+                    </div>
+                </div>
+
+                {% if suggestions %}
+                    <div class="suggestions-grid">
+                        {% for suggestion in suggestions %}
+                            {% if suggestion.strip() %}
+                                <div class="suggestion-card">
+                                    <h3>
+                                        <i class="fas fa-book book-icon"></i>
+                                        {{ suggestion }}
+                                    </h3>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>No recommendations found</h3>
+                        <p>Try rephrasing your request or being more specific about what you're looking for.</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function fillQuery(query) {
+            document.getElementById('user_input').value = query;
+            document.getElementById('user_input').focus();
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('searchBtn');
+            const btnText = btn.querySelector('.btn-text');
+            const spinner = btn.querySelector('.loading-spinner');
+            
+            btn.classList.add('loading');
+            btn.disabled = true;
+            btnText.textContent = 'Getting Recommendations...';
+            spinner.style.display = 'block';
+        });
+
+        // Auto-resize textarea
+        const textarea = document.getElementById('user_input');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(120, this.scrollHeight) + 'px';
+        });
+
+        // Add some interactive effects
+        document.querySelectorAll('.suggestion-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

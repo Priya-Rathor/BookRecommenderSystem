@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookVerse - Smart Book Recommendations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #5855eb;
+            --secondary-color: #f59e0b;
+            --background-dark: #0f172a;
+            --background-card: #1e293b;
+            --background-light: #f8fafc;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-dark: #1e293b;
+            --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --border-color: #334155;
+            --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Debug Console Styles */
+        .debug-console {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 350px;
+            max-height: 300px;
+            background: rgba(0, 0, 0, 0.95);
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-y: auto;
+            z-index: 10000;
+            border: 2px solid #333;
+            backdrop-filter: blur(10px);
+        }
+
+        .debug-console .log-entry {
+            margin-bottom: 3px;
+            padding: 2px 0;
+            word-wrap: break-word;
+        }
+
+        .debug-console .error {
+            color: #ff4444;
+            font-weight: bold;
+        }
+
+        .debug-console .success {
+            color: #00ff44;
+        }
+
+        .debug-console .warning {
+            color: #ffaa00;
+        }
+
+        .debug-console .info {
+            color: #00aaff;
+        }
+
+        /* Auth Page Styles */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--background-card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-large);
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: rgba(30, 41, 59, 0.5);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-switch a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-switch a:hover {
+            color: var(--primary-hover);
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .header {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .search-section {
+            background: var(--background-card);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .search-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            flex: 2;
+            min-width: 300px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.5);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--background-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-top: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .ai-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary-color);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .book-card {
+            background: var(--background-card);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-large);
+            border-color: var(--primary-color);
+        }
+
+        .book-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .book-card:hover .book-image {
+            transform: scale(1.05);
+        }
+
+        .book-info {
+            padding: 1.25rem;
+        }
+
+        .book-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-author {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .book-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .rating-stars {
+            color: var(--secondary-color);
+        }
+
+        .rating-text {
+            color: var(--text-secondary);
+        }
+
+        .book-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .book-card:hover .book-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .action-btn.like {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .action-btn.recommend {
+            background: rgba(99, 102, 241, 0.9);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .history-list {
+            background: var(--background-card);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .history-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-info h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .history-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .history-meta {
+            text-align: right;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .search-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-controls {
+                min-width: auto;
+            }
+
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .book-image {
+                height: 220px;
+            }
+
+            .book-info {
+                padding: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .history-meta {
+                text-align: left;
+            }
+
+            .debug-console {
+                width: calc(100vw - 20px);
+                right: 10px;
+                top: 5px;
+                max-height: 200px;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug Console -->
+    <div id="debugConsole" class="debug-console">
+        <div class="log-entry">🔍 Debug Console Initialized</div>
+    </div>
+
+    <!-- Authentication Page -->
+    <div id="authPage" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>BookVerse</h1>
+                <p>Discover your next favorite book with AI-powered recommendations</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span>Sign In</span>
+                </button>
+                <div class="auth-switch">
+                    Don't have an account? <a href="#" id="showRegister">Sign up</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display: none;">
+                <div class="form-group">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span>Create Account</span>
+                </button>
+                <div class="auth-switch">
+                    Already have an account? <a href="#" id="showLogin">Sign in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">BookVerse</div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        Welcome, <span id="currentUser"></span>
+                    </div>
+                    <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-header">
+                    <div>
+                        <h2 class="search-title">Discover Books</h2>
+                        <p class="section-subtitle">Search and get personalized recommendations</p>
+                    </div>
+                    <div class="search-controls">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search for books or describe what you're looking for...">
+                        <div class="search-suggestions" id="searchSuggestions"></div>
+                        <div class="ai-toggle">
+                            <span>AI Search</span>
+                            <div class="toggle-switch active" id="aiToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                        <button id="searchBtn" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search Results -->
+            <section id="searchResults" class="section" style="display: none;">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Search Results</h2>
+                        <p class="section-subtitle" id="searchResultsSubtitle"></p>
+                    </div>
+                </div>
+                <div id="searchResultsGrid" class="books-grid"></div>
+            </section>
+
+            <!-- Popular Books -->
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Popular Books</h2>
+                        <p class="section-subtitle">Trending books loved by readers</p>
+                    </div>
+                </div>
+                <div id="popularBooksGrid" class="books-grid"></div>
+            </section>
+
+            <!-- Personalized Recommendations -->
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Recommended for You</h2>
+                        <p class="section-subtitle">Based on your reading history and preferences</p>
+                    </div>
+                </div>
+                <div id="recommendationsGrid" class="books-grid"></div>
+            </section>
+
+            <!-- Reading History -->
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Your Reading History</h2>
+                        <p class="section-subtitle">Track your book interactions and discoveries</p>
+                    </div>
+                </div>
+                <div id="historyList" class="history-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Debug Console Function
+        const debugConsole = document.getElementById('debugConsole');
+        const debugLog = (message, type = 'info') => {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            debugConsole.appendChild(logEntry);
+            debugConsole.scrollTop = debugConsole.scrollHeight;
+            
+            // Also log to browser console
+            const consoleMethod = type === 'error' ? 'error' : type === 'warning' ? 'warn' : 'log';
+            console[consoleMethod](`DEBUG: ${message}`);
+            
+            // Keep only last 100 entries
+            const entries = debugConsole.querySelectorAll('.log-entry');
+            if (entries.length > 100) {
+                entries[0].remove();
+            }
+        };
+
+        // API Configuration
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        debugLog(`API Base URL: ${API_BASE_URL}`, 'info');
+        
+        // Global state
+        let currentUser = null;
+        let authToken = null;
+        let aiSearchEnabled = true;
+        let searchTimeout = null;
+
+        debugLog('Global state initialized', 'success');
+
+        // DOM Elements
+        const authPage = document.getElementById('authPage');
+        const dashboard = document.getElementById('dashboard');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const currentUserSpan = document.getElementById('currentUser');
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('searchSuggestions');
+        const aiToggle = document.getElementById('aiToggle');
+        const searchBtn = document.getElementById('searchBtn');
+
+        debugLog('DOM elements loaded', 'success');
+
+        // Utility Functions
+        const showError = (message) => {
+            debugLog(`ERROR: ${message}`, 'error');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message slide-up';
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => errorDiv.remove(), 5000);
+        };
+
+        const showSuccess = (message) => {
+            debugLog(`SUCCESS: ${message}`, 'success');
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message slide-up';
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+            setTimeout(() => successDiv.remove(), 3000);
+        };
+
+        const createLoadingSpinner = () => {
+            debugLog('Creating loading spinner', 'info');
+            return '<div class="loading"><div class="spinner"></div>Loading...</div>';
+        };
+
+        const formatDate = (dateString) => {
+            try {
+                debugLog(`Formatting date: ${dateString}`, 'info');
+                const result = new Date(dateString).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                debugLog(`Formatted date result: ${result}`, 'success');
+                return result;
+            } catch (error) {
+                debugLog(`Date formatting error: ${error.message}`, 'error');
+                return 'Invalid Date';
+            }
+        };
+
+        const generateStars = (rating) => {
+            try {
+                debugLog(`Generating stars for rating: ${rating}`, 'info');
+                
+                // Validate input
+                if (rating === null || rating === undefined || isNaN(rating)) {
+                    debugLog(`Invalid rating value: ${rating}`, 'warning');
+                    rating = 0;
+                }
+                
+                // Ensure rating is a number between 0 and 5
+                rating = Math.max(0, Math.min(5, Number(rating)));
+                debugLog(`Normalized rating: ${rating}`, 'info');
+                
+                const fullStars = Math.floor(rating);
+                const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+                const emptyStars = Math.max(0, 5 - fullStars - halfStar);
+                
+                debugLog(`Stars breakdown - Full: ${fullStars}, Half: ${halfStar}, Empty: ${emptyStars}`, 'info');
+                
+                // Use Math.max to prevent negative repeat counts
+                const fullStarsStr = '★'.repeat(Math.max(0, fullStars));
+                const halfStarStr = halfStar ? '☆' : '';
+                const emptyStarsStr = '☆'.repeat(Math.max(0, emptyStars));
+                
+                const result = fullStarsStr + halfStarStr + emptyStarsStr;
+                debugLog(`Generated stars: ${result}`, 'success');
+                
+                return result;
+            } catch (error) {
+                debugLog(`Error generating stars: ${error.message}`, 'error');
+                return '☆☆☆☆☆'; // Return 5 empty stars as fallback
+            }
+        };
+
+        // API Functions
+        const apiCall = async (endpoint, options = {}) => {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+                }
+            };
+
+            debugLog(`API Call: ${options.method || 'GET'} ${url}`, 'info');
+
+            try {
+                const response = await fetch(url, { ...defaultOptions, ...options });
+                debugLog(`Response status: ${response.status}`, 'info');
+                
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                    debugLog(`Response data keys: ${Object.keys(data)}`, 'info');
+                } else {
+                    const text = await response.text();
+                    debugLog(`Non-JSON response: ${text}`, 'error');
+                    throw new Error('Server returned non-JSON response');
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.detail || data.message || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return data;
+            } catch (error) {
+                debugLog(`API call failed: ${error.message}`, 'error');
+                
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    throw new Error('Cannot connect to server. Please check if the backend is running on http://127.0.0.1:8000');
+                }
+                
+                throw error;
+            }
+        };
+
+        // Authentication Functions
+        const register = async (username, email, password) => {
+            debugLog(`Attempting to register user: ${username}`, 'info');
+            return await apiCall('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ username, email, password })
+            });
+        };
+
+        const login = async (username, password) => {
+            debugLog(`Attempting to login user: ${username}`, 'info');
+            const data = await apiCall('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+            
+            authToken = data.access_token;
+            currentUser = data.username;
+            localStorage.setItem('authToken', authToken);
+            localStorage.setItem('currentUser', currentUser);
+            
+            debugLog(`Login successful for user: ${currentUser}`, 'success');
+            return data;
+        };
+
+        const logout = () => {
+            debugLog('Logging out user', 'info');
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            showDashboard(false);
+        };
+
+        // UI Functions
+        const showDashboard = (show) => {
+            debugLog(`Showing dashboard: ${show}`, 'info');
+            if (show) {
+                authPage.style.display = 'none';
+                dashboard.classList.add('active');
+                currentUserSpan.textContent = currentUser;
+                loadDashboardData();
+            } else {
+                authPage.style.display = 'flex';
+                dashboard.classList.remove('active');
+            }
+        };
+
+        const createBookCard = (book, showActions = true) => {
+            try {
+                debugLog(`Creating book card for: ${book?.title || 'Unknown Title'}`, 'info');
+                
+                // Validate book object
+                if (!book) {
+                    debugLog('Book object is null or undefined', 'error');
+                    return '<div class="error-message">Invalid book data</div>';
+                }
+                
+                // Ensure required fields have defaults
+                const title = book.title || 'Unknown Title';
+                const author = book.author || 'Unknown Author';
+                const rating = book.avg_rating || book.similarity_score || 4.0;
+                const imageUrl = book.image_url && book.image_url !== 'https://via.placeholder.com/150x200' 
+                    ? book.image_url 
+                    : `https://covers.openlibrary.org/b/title/${encodeURIComponent(title)}-M.jpg?default=https://via.placeholder.com/200x280/6366f1/ffffff?text=${encodeURIComponent(title.substring(0, 2))}`;
+
+                debugLog(`Book card data - Title: ${title}, Author: ${author}, Rating: ${rating}`, 'info');
+
+                const cardHtml = `
+                    <div class="book-card fade-in" data-title="${title}" data-author="${author}">
+                        <img src="${imageUrl}" alt="${title}" class="book-image" 
+                             onerror="this.src='https://via.placeholder.com/200x280/6366f1/ffffff?text=${encodeURIComponent(title.substring(0, 2))}'">
+                        ${showActions ? `
+                            <div class="book-actions">
+                                <button class="action-btn like" onclick="likeBook('${title.replace(/'/g, "\\'")}', '${author.replace(/'/g, "\\'")}')">♥</button>
+                                <button class="action-btn recommend" onclick="getRecommendations('${title.replace(/'/g, "\\'")}')">→</button>
+                            </div>
+                        ` : ''}
+                        <div class="book-info">
+                            <h3 class="book-title">${title}</h3>
+                            <p class="book-author">${author}</p>
+                            <div class="book-rating">
+                                <span class="rating-stars">${generateStars(rating)}</span>
+                                <span class="rating-text">${Number(rating).toFixed(1)}</span>
+                                ${book.num_ratings ? `<span class="rating-text">(${book.num_ratings})</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                debugLog('Book card created successfully', 'success');
+                return cardHtml;
+            } catch (error) {
+                debugLog(`Error creating book card: ${error.message}`, 'error');
+                return '<div class="error-message">Error displaying book</div>';
+            }
+        };
+
+        // Data Loading Functions
+        const loadPopularBooks = async () => {
+            try {
+                debugLog('=== LOADING POPULAR BOOKS ===', 'info');
+                const grid = document.getElementById('popularBooksGrid');
+                
+                if (!grid) {
+                    debugLog('Popular books grid element not found', 'error');
+                    return;
+                }
+                
+                grid.innerHTML = createLoadingSpinner();
+                debugLog('Loading spinner added to popular books grid', 'info');
+                
+                const data = await apiCall('/books/popular');
+                debugLog(`Popular books API response received`, 'success');
+                debugLog(`Response structure: ${JSON.stringify(Object.keys(data))}`, 'info');
+                
+                // Check different possible data structures
+                let booksArray = null;
+                if (data.books && Array.isArray(data.books)) {
+                    booksArray = data.books;
+                    debugLog(`Found books array with ${booksArray.length} items`, 'success');
+                } else if (Array.isArray(data)) {
+                    booksArray = data;
+                    debugLog(`Data is array with ${booksArray.length} items`, 'success');
+                } else {
+                    debugLog(`Unexpected data structure: ${JSON.stringify(data)}`, 'warning');
+                }
+                
+                if (booksArray && booksArray.length > 0) {
+                    debugLog(`Processing ${booksArray.length} books`, 'info');
+                    
+                    // Process each book individually
+                    const bookCards = [];
+                    for (let i = 0; i < booksArray.length; i++) {
+                        const book = booksArray[i];
+                        debugLog(`Processing book ${i + 1}: ${book?.title || 'No title'}`, 'info');
+                        
+                        try {
+                            const cardHtml = createBookCard(book);
+                            bookCards.push(cardHtml);
+                            debugLog(`Book ${i + 1} processed successfully`, 'success');
+                        } catch (bookError) {
+                            debugLog(`Error processing book ${i + 1}: ${bookError.message}`, 'error');
+                            continue;
+                        }
+                    }
+                    
+                    if (bookCards.length > 0) {
+                        grid.innerHTML = bookCards.join('');
+                        debugLog(`Successfully loaded ${bookCards.length} popular books`, 'success');
+                    } else {
+                        grid.innerHTML = '<div class="error-message">No valid books to display</div>';
+                        debugLog('No valid book cards created', 'warning');
+                    }
+                } else {
+                    grid.innerHTML = '<div class="empty-state"><h3>No popular books available</h3><p>Check back later for trending books</p></div>';
+                    debugLog('No books found in response', 'warning');
+                }
+            } catch (error) {
+                debugLog(`=== POPULAR BOOKS ERROR ===`, 'error');
+                debugLog(`Error type: ${error.name}`, 'error');
+                debugLog(`Error message: ${error.message}`, 'error');
+                debugLog(`Error stack: ${error.stack}`, 'error');
+                
+                showError(`Failed to load popular books: ${error.message}`);
+                const grid = document.getElementById('popularBooksGrid');
+                if (grid) {
+                    grid.innerHTML = `<div class="error-message">Failed to load popular books: ${error.message}</div>`;
+                }
+            }
+        };
+
+        const loadPersonalizedRecommendations = async () => {
+            try {
+                debugLog('=== LOADING PERSONALIZED RECOMMENDATIONS ===', 'info');
+                const grid = document.getElementById('recommendationsGrid');
+                
+                if (!grid) {
+                    debugLog('Recommendations grid element not found', 'error');
+                    return;
+                }
+                
+                grid.innerHTML = createLoadingSpinner();
+                debugLog('Loading spinner added to recommendations grid', 'info');
+                
+                const data = await apiCall('/user/recommendations');
+                debugLog(`Recommendations API response received`, 'success');
+                debugLog(`Response structure: ${JSON.stringify(Object.keys(data))}`, 'info');
+                
+                // Check different possible data structures
+                let booksArray = null;
+                if (data.books && Array.isArray(data.books)) {
+                    booksArray = data.books;
+                    debugLog(`Found fallback books array with ${booksArray.length} items`, 'success');
+                } else if (data.recommendations && Array.isArray(data.recommendations)) {
+                    booksArray = data.recommendations;
+                    debugLog(`Found recommendations array with ${booksArray.length} items`, 'success');
+                } else if (Array.isArray(data)) {
+                    booksArray = data;
+                    debugLog(`Data is array with ${booksArray.length} items`, 'success');
+                } else {
+                    debugLog(`Unexpected recommendations data structure: ${JSON.stringify(data)}`, 'warning');
+                }
+                
+                if (booksArray && booksArray.length > 0) {
+                    debugLog(`Processing ${booksArray.length} recommended books`, 'info');
+                    
+                    const bookCards = [];
+                    for (let i = 0; i < booksArray.length; i++) {
+                        const book = booksArray[i];
+                        debugLog(`Processing recommendation ${i + 1}: ${book?.title || 'No title'}`, 'info');
+                        
+                        try {
+                            const cardHtml = createBookCard(book);
+                            bookCards.push(cardHtml);
+                            debugLog(`Recommendation ${i + 1} processed successfully`, 'success');
+                        } catch (bookError) {
+                            debugLog(`Error processing recommendation ${i + 1}: ${bookError.message}`, 'error');
+                            continue;
+                        }
+                    }
+                    
+                    if (bookCards.length > 0) {
+                        grid.innerHTML = bookCards.join('');
+                        debugLog(`Successfully loaded ${bookCards.length} recommendations`, 'success');
+                    } else {
+                        grid.innerHTML = '<div class="error-message">No valid recommendations to display</div>';
+                        debugLog('No valid recommendation cards created', 'warning');
+                    }
+                } else {
+                    grid.innerHTML = '<div class="empty-state"><h3>No recommendations yet</h3><p>Start exploring books to get personalized recommendations</p></div>';
+                    debugLog('No recommendations found in response', 'info');
+                }
+            } catch (error) {
+                debugLog(`=== RECOMMENDATIONS ERROR ===`, 'error');
+                debugLog(`Error type: ${error.name}`, 'error');
+                debugLog(`Error message: ${error.message}`, 'error');
+                debugLog(`Error stack: ${error.stack}`, 'error');
+                
+                showError(`Failed to load recommendations: ${error.message}`);
+                const grid = document.getElementById('recommendationsGrid');
+                if (grid) {
+                    grid.innerHTML = `<div class="error-message">Failed to load recommendations: ${error.message}</div>`;
+                }
+            }
+        };
+
+        const loadUserHistory = async () => {
+            try {
+                debugLog('=== LOADING USER HISTORY ===', 'info');
+                const historyList = document.getElementById('historyList');
+                
+                if (!historyList) {
+                    debugLog('History list element not found', 'error');
+                    return;
+                }
+                
+                historyList.innerHTML = createLoadingSpinner();
+                debugLog('Loading spinner added to history list', 'info');
+                
+                const data = await apiCall('/user/history');
+                debugLog(`History API response received`, 'success');
+                debugLog(`Response structure: ${JSON.stringify(Object.keys(data))}`, 'info');
+                
+                if (data.history && Array.isArray(data.history) && data.history.length > 0) {
+                    debugLog(`Processing ${data.history.length} history items`, 'info');
+                    
+                    const historyItems = data.history.map((item, index) => {
+                        debugLog(`Processing history item ${index + 1}: ${item?.book_title || 'No title'}`, 'info');
+                        
+                        try {
+                            return `
+                                <div class="history-item">
+                                    <div class="history-info">
+                                        <h4>${item.book_title || 'Unknown Title'}</h4>
+                                        <p>${item.author || 'Unknown Author'} • ${item.interaction_type || 'Unknown'}${item.rating ? ` • Rated ${item.rating}/5` : ''}</p>
+                                    </div>
+                                    <div class="history-meta">
+                                        ${formatDate(item.created_at)}
+                                    </div>
+                                </div>
+                            `;
+                        } catch (itemError) {
+                            debugLog(`Error processing history item ${index + 1}: ${itemError.message}`, 'error');
+                            return '';
+                        }
+                    }).filter(item => item !== '');
+                    
+                    if (historyItems.length > 0) {
+                        historyList.innerHTML = historyItems.join('');
+                        debugLog(`Successfully loaded ${historyItems.length} history items`, 'success');
+                    } else {
+                        historyList.innerHTML = '<div class="error-message">No valid history items to display</div>';
+                        debugLog('No valid history items created', 'warning');
+                    }
+                } else {
+                    historyList.innerHTML = '<div class="empty-state"><h3>No history yet</h3><p>Your book interactions will appear here</p></div>';
+                    debugLog('No history found in response', 'info');
+                }
+            } catch (error) {
+                debugLog(`=== HISTORY ERROR ===`, 'error');
+                debugLog(`Error type: ${error.name}`, 'error');
+                debugLog(`Error message: ${error.message}`, 'error');
+                debugLog(`Error stack: ${error.stack}`, 'error');
+                
+                showError(`Failed to load history: ${error.message}`);
+                const historyList = document.getElementById('historyList');
+                if (historyList) {
+                    historyList.innerHTML = `<div class="error-message">Failed to load history: ${error.message}</div>`;
+                }
+            }
+        };
+
+        const loadDashboardData = async () => {
+            debugLog('=== LOADING DASHBOARD DATA ===', 'info');
+            debugLog(`Current user: ${currentUser}`, 'info');
+            debugLog(`Auth token exists: ${!!authToken}`, 'info');
+            
+            // Load popular books first (no auth required)
+            debugLog('Starting to load popular books...', 'info');
+            await loadPopularBooks();
+            
+            // Then load user-specific data (requires auth)
+            if (authToken) {
+                debugLog('Loading user-specific data...', 'info');
+                await Promise.all([
+                    loadPersonalizedRecommendations(),
+                    loadUserHistory()
+                ]);
+                debugLog('All dashboard data loading completed', 'success');
+            } else {
+                debugLog('No auth token available for user-specific data', 'warning');
+            }
+        };
+
+        // Search Functions
+        const searchBooks = async (query, useAI = true) => {
+            try {
+                debugLog(`=== SEARCHING BOOKS ===`, 'info');
+                debugLog(`Query: "${query}", AI: ${useAI}`, 'info');
+                
+                const resultsSection = document.getElementById('searchResults');
+                const resultsGrid = document.getElementById('searchResultsGrid');
+                const resultsSubtitle = document.getElementById('searchResultsSubtitle');
+                
+                resultsSection.style.display = 'block';
+                resultsGrid.innerHTML = createLoadingSpinner();
+                
+                const data = await apiCall('/books/smart-search', {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        query: query,
+                        use_gemini: useAI 
+                    })
+                });
+                
+                debugLog(`Search results received`, 'success');
+                debugLog(`Response structure: ${JSON.stringify(Object.keys(data))}`, 'info');
+                
+                if (data.results && data.results.length > 0) {
+                    const bookCards = data.results.map(book => createBookCard(book));
+                    resultsGrid.innerHTML = bookCards.join('');
+                    resultsSubtitle.textContent = `Found ${data.results.length} results using ${data.method || 'search'} method`;
+                    debugLog(`Successfully displayed ${data.results.length} search results`, 'success');
+                } else {
+                    resultsGrid.innerHTML = '<div class="empty-state"><h3>No results found</h3><p>Try adjusting your search terms</p></div>';
+                    resultsSubtitle.textContent = 'No results found';
+                    debugLog('No search results found', 'info');
+                }
+                
+                // Log search interaction
+                if (authToken) {
+                    logInteraction(query, '', 'smart_search');
+                }
+                
+            } catch (error) {
+                debugLog(`=== SEARCH ERROR ===`, 'error');
+                debugLog(`Error: ${error.message}`, 'error');
+                showError(`Search failed: ${error.message}`);
+                document.getElementById('searchResultsGrid').innerHTML = `<div class="error-message">Search failed: ${error.message}</div>`;
+            }
+        };
+
+        const getSuggestions = async (query) => {
+            if (!query || query.length < 2) {
+                searchSuggestions.style.display = 'none';
+                return;
+            }
+            
+            try {
+                debugLog(`Getting suggestions for: "${query}"`, 'info');
+                const data = await apiCall(`/books/search?q=${encodeURIComponent(query)}`);
+                
+                if (data.results && data.results.length > 0) {
+                    searchSuggestions.innerHTML = data.results.map(title => 
+                        `<div class="suggestion-item" onclick="selectSuggestion('${title.replace(/'/g, "\\'")}')">${title}</div>`
+                    ).join('');
+                    searchSuggestions.style.display = 'block';
+                    debugLog(`Showed ${data.results.length} suggestions`, 'success');
+                } else {
+                    searchSuggestions.style.display = 'none';
+                    debugLog('No suggestions found', 'info');
+                }
+            } catch (error) {
+                debugLog(`Failed to get suggestions: ${error.message}`, 'error');
+                searchSuggestions.style.display = 'none';
+            }
+        };
+
+        const selectSuggestion = (title) => {
+            debugLog(`Selected suggestion: ${title}`, 'info');
+            searchInput.value = title;
+            searchSuggestions.style.display = 'none';
+            searchBooks(title, aiSearchEnabled);
+        };
+
+        // Book Interaction Functions
+        const likeBook = async (title, author) => {
+            try {
+                debugLog(`Liking book: ${title} by ${author}`, 'info');
+                await apiCall('/user/interaction', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        book_title: title,
+                        author: author,
+                        interaction_type: 'like'
+                    })
+                });
+                showSuccess(`Added "${title}" to your liked books!`);
+                // Refresh recommendations and history
+                loadPersonalizedRecommendations();
+                loadUserHistory();
+                debugLog(`Successfully liked book: ${title}`, 'success');
+            } catch (error) {
+                debugLog(`Failed to like book: ${error.message}`, 'error');
+                showError('Failed to like book');
+            }
+        };
+
+        const getRecommendations = async (title) => {
+            try {
+                debugLog(`Getting recommendations for: "${title}"`, 'info');
+                
+                const resultsSection = document.getElementById('searchResults');
+                const resultsGrid = document.getElementById('searchResultsGrid');
+                const resultsSubtitle = document.getElementById('searchResultsSubtitle');
+                
+                resultsSection.style.display = 'block';
+                resultsGrid.innerHTML = createLoadingSpinner();
+                
+                const data = await apiCall('/books/recommend', {
+                    method: 'POST',
+                    body: JSON.stringify({ book_title: title })
+                });
+                
+                debugLog(`Recommendation response received`, 'success');
+                
+                if (data.recommendations && data.recommendations.length > 0) {
+                    const bookCards = data.recommendations.map(book => createBookCard(book));
+                    resultsGrid.innerHTML = bookCards.join('');
+                    resultsSubtitle.textContent = `Recommendations based on "${data.based_on}"`;
+                    debugLog(`Successfully displayed ${data.recommendations.length} recommendations`, 'success');
+                } else {
+                    resultsGrid.innerHTML = '<div class="empty-state"><h3>No recommendations found</h3><p>Try selecting another book</p></div>';
+                    debugLog('No recommendations found', 'info');
+                }
+                
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                debugLog(`Failed to get recommendations: ${error.message}`, 'error');
+                showError(`Failed to get recommendations: ${error.message}`);
+                document.getElementById('searchResultsGrid').innerHTML = `<div class="error-message">Failed to get recommendations: ${error.message}</div>`;
+            }
+        };
+
+        const logInteraction = async (title, author, type, rating = null) => {
+            try {
+                await apiCall('/user/interaction', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        book_title: title,
+                        author: author,
+                        interaction_type: type,
+                        rating: rating
+                    })
+                });
+                debugLog(`Logged interaction: ${type} for ${title}`, 'success');
+            } catch (error) {
+                debugLog(`Failed to log interaction: ${error.message}`, 'error');
+            }
+        };
+
+        // Event Listeners
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                await login(username, password);
+                showSuccess('Login successful!');
+                showDashboard(true);
+            } catch (error) {
+                showError(error.message || 'Login failed');
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            
+            try {
+                await register(username, email, password);
+                showSuccess('Registration successful! Please login.');
+                showLogin.click();
+            } catch (error) {
+                showError(error.message || 'Registration failed');
+            }
+        });
+
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            logout();
+        });
+
+        aiToggle.addEventListener('click', () => {
+            aiSearchEnabled = !aiSearchEnabled;
+            aiToggle.classList.toggle('active', aiSearchEnabled);
+            debugLog(`AI search toggled: ${aiSearchEnabled}`, 'info');
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                getSuggestions(e.target.value);
+            }, 300);
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchBtn.click();
+            }
+        });
+
+        searchInput.addEventListener('blur', () => {
+            // Delay hiding suggestions to allow for clicks
+            setTimeout(() => {
+                searchSuggestions.style.display = 'none';
+            }, 200);
+        });
+
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                searchBooks(query, aiSearchEnabled);
+            }
+        });
+
+        // Click outside suggestions to hide
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-controls')) {
+                searchSuggestions.style.display = 'none';
+            }
+        });
+
+        // Book card click handlers
+        document.addEventListener('click', (e) => {
+            const bookCard = e.target.closest('.book-card');
+            if (bookCard && !e.target.closest('.book-actions')) {
+                const title = bookCard.dataset.title;
+                const author = bookCard.dataset.author;
+                logInteraction(title, author, 'view');
+            }
+        });
+
+        // Initialize App
+        const initApp = () => {
+            debugLog('=== INITIALIZING APP ===', 'info');
+            
+            // Check for stored auth token
+            const storedToken = localStorage.getItem('authToken');
+            const storedUser = localStorage.getItem('currentUser');
+            
+            debugLog(`Stored token exists: ${!!storedToken}`, 'info');
+            debugLog(`Stored user: ${storedUser}`, 'info');
+            
+            if (storedToken && storedUser) {
+                authToken = storedToken;
+                currentUser = storedUser;
+                showDashboard(true);
+                debugLog('Auto-login successful', 'success');
+            } else {
+                showDashboard(false);
+                debugLog('No stored credentials, showing auth page', 'info');
+            }
+        };
+
+        // Start the application
+        debugLog('=== BOOKVERSE STARTING ===', 'success');
+        initApp();
+
+        // Add some smooth scrolling for better UX
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Enhanced error handling for network issues
+        window.addEventListener('online', () => {
+            showSuccess('Connection restored!');
+            debugLog('Connection restored', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showError('You are offline. Some features may not work.');
+            debugLog('Connection lost', 'warning');
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + K for quick search focus
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+                debugLog('Quick search activated', 'info');
+            }
+            
+            // Escape to close suggestions
+            if (e.key === 'Escape') {
+                searchSuggestions.style.display = 'none';
+                searchInput.blur();
+            }
+        });
+
+        // Add dynamic theme based on time of day
+        const setTheme = () => {
+            const hour = new Date().getHours();
+            const isDark = hour < 7 || hour > 19;
+            document.documentElement.style.setProperty('--theme-mode', isDark ? 'dark' : 'auto');
+        };
+
+        setTheme();
+        setInterval(setTheme, 3600000); // Update every hour
+
+        debugLog('📚 BookVerse initialized successfully!', 'success');
+        debugLog('🚀 Features: AI-powered search, personalized recommendations, reading history', 'success');
+        debugLog('⌨️ Tip: Press Ctrl+K to quickly focus the search bar', 'success');
+        debugLog('🔍 Debug console active - watch for detailed logs', 'success');
+    </script>
+</body>
+</html>
