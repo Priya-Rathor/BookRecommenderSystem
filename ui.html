@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Little Belle Adventures - Book Recommendation System</title>
+    <title>BookFinder - AI-Powered Book Recommendations</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,24 +12,38 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f2 50%, #b8dce8 100%);
-            min-height: 100vh;
-            color: #2c3e50;
-            overflow-x: hidden;
+        :root {
+            --primary: #6C63FF;
+            --secondary: #FF6584;
+            --background: #F8F9FA;
+            --text: #333333;
+            --card-bg: #FFFFFF;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --transition: all 0.3s ease;
         }
 
-        /* Header Styles */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 0;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 3px solid #5fb3d4;
+            padding: 1rem 0;
         }
 
         .nav-container {
@@ -41,410 +56,400 @@
         }
 
         .logo {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
         }
 
-        .logo h1 {
-            font-size: 2.5rem;
-            color: #5fb3d4;
-            font-style: italic;
-            margin-bottom: 0.25rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
         }
 
-        .logo p {
-            color: #7fb3d3;
-            font-size: 0.9rem;
-            font-style: italic;
+        .logo:hover {
+            transform: translateY(-1px);
         }
 
         .nav-menu {
             display: flex;
-            list-style: none;
-            gap: 2rem;
             align-items: center;
+            gap: 2rem;
         }
 
-        .nav-menu a {
+        .nav-link {
+            color: var(--text);
             text-decoration: none;
-            color: #2c3e50;
             font-weight: 500;
             padding: 0.5rem 1rem;
-            border-radius: 25px;
-            transition: all 0.3s ease;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            position: relative;
         }
 
-        .nav-menu a:hover {
-            background: #5fb3d4;
-            color: white;
-            transform: translateY(-2px);
+        .nav-link:hover {
+            color: var(--primary);
+            background-color: rgba(108, 99, 255, 0.1);
         }
 
-        .user-info {
+        .nav-link.active {
+            color: var(--primary);
+            background-color: rgba(108, 99, 255, 0.15);
+        }
+
+        .user-menu {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
 
-        .logout-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-        }
-
-        /* Auth Page Styles */
-        .auth-page {
-            min-height: 100vh;
+        .user-info {
             display: flex;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
-            overflow: hidden;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(108, 99, 255, 0.1);
+            border-radius: var(--border-radius);
+            color: var(--primary);
+            font-weight: 500;
         }
 
-        .auth-page::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="%23ffffff" opacity="0.1"/></svg>') repeat;
-            animation: float 20s infinite linear;
-        }
-
-        @keyframes float {
-            from { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
-            to { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
-        }
-
-        .auth-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .auth-header {
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 0.9rem;
             text-align: center;
-            margin-bottom: 2rem;
+            justify-content: center;
         }
 
-        .auth-header h2 {
-            color: #5fb3d4;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background-color: #5A52E3;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary:hover {
+            background-color: #E85570;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background-color: var(--card-bg);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Container and Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .page {
+            display: none;
+            min-height: calc(100vh - 80px);
+            padding: 2rem 0;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.1) 0%, rgba(255, 101, 132, 0.1) 100%);
+            border-radius: var(--border-radius);
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Form Styles */
+        .form-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
         }
 
         .form-group {
             margin-bottom: 1.5rem;
         }
 
-        .form-group label {
+        .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #2c3e50;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #5fb3d4;
-            box-shadow: 0 0 0 3px rgba(95, 179, 212, 0.1);
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #5fb3d4, #4a90c2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            color: var(--text);
         }
 
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(95, 179, 212, 0.3);
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--card-bg);
         }
 
-        .auth-switch {
-            text-align: center;
-            margin-top: 1.5rem;
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
         }
 
-        .auth-switch a {
-            color: #5fb3d4;
-            text-decoration: none;
-            font-weight: 500;
+        .form-input.error {
+            border-color: var(--error);
         }
 
-        /* Guest Access */
-        .guest-access {
-            text-align: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e0e0e0;
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .guest-btn {
-            color: #7f8c8d;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-
-        .guest-btn:hover {
-            color: #5fb3d4;
-        }
-
-        /* Dashboard Styles */
-        .dashboard {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .dashboard.active {
-            display: block;
-            opacity: 1;
-        }
-
-        .hero-section {
-            background: linear-gradient(135deg, rgba(95, 179, 212, 0.1), rgba(181, 203, 220, 0.1));
-            padding: 4rem 0;
-            text-align: center;
-            position: relative;
-        }
-
-        .hero-content h1 {
-            font-size: 3rem;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .hero-content p {
-            font-size: 1.2rem;
-            color: #5a6c7d;
-            margin-bottom: 2rem;
+        .success-message {
+            color: var(--success);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         /* Search Styles */
-        .search-section {
-            background: white;
-            padding: 2rem 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
         .search-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
             position: relative;
+            max-width: 600px;
+            margin: 2rem auto;
         }
 
         .search-input {
-            flex: 1;
-            padding: 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            width: 100%;
+            padding: 1rem 1.5rem 1rem 3rem;
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            background-color: var(--card-bg);
+            transition: var(--transition);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #5fb3d4;
-            box-shadow: 0 0 0 3px rgba(95, 179, 212, 0.1);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
         }
 
-        .search-btn {
-            padding: 1rem 2rem;
-            background: linear-gradient(135deg, #5fb3d4, #4a90c2);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 1.2rem;
         }
 
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(95, 179, 212, 0.3);
-        }
-
-        .ai-toggle {
+        .search-toggle {
+            margin-top: 1rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
             justify-content: center;
-            margin-top: 1rem;
+            gap: 1rem;
         }
 
         .toggle-switch {
             position: relative;
+            display: inline-block;
             width: 60px;
-            height: 30px;
-            background: #ccc;
-            border-radius: 15px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-switch.active {
-            background: #5fb3d4;
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle-switch.active::after {
-            left: 32px;
-        }
-
-        .search-suggestions {
-            position: absolute;
-            top: 100%;
+            top: 0;
             left: 0;
-            right: 80px;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            display: none;
-            z-index: 1000;
-            max-height: 300px;
-            overflow-y: auto;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
         }
 
-        .suggestion-item {
-            padding: 1rem;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            transition: all 0.3s ease;
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
         }
 
-        .suggestion-item:hover {
-            background: #f8f9fa;
-            color: #5fb3d4;
+        input:checked + .slider {
+            background-color: var(--primary);
         }
 
-        /* Content Sections */
-        .content-section {
-            padding: 3rem 0;
-            max-width: 1200px;
-            margin: 0 auto;
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
 
-        .section-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
-
-        .section-header p {
-            color: #5a6c7d;
-            font-size: 1.1rem;
-        }
-
-        /* Book Grid Styles */
-        .books-grid {
+        /* Grid and Card Styles */
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 2rem;
-            padding: 0 2rem;
+            margin-top: 2rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         }
 
         .book-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid transparent;
             position: relative;
-            cursor: pointer;
+            overflow: hidden;
         }
 
         .book-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .book-card:hover::before {
+            opacity: 1;
         }
 
         .book-image {
             width: 100%;
-            height: 300px;
-            object-fit: cover;
-            transition: all 0.3s ease;
-        }
-
-        .book-card:hover .book-image {
-            transform: scale(1.05);
-        }
-
-        .book-info {
-            padding: 1.5rem;
+            height: 200px;
+            background-color: var(--background);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
 
         .book-title {
-            font-size: 1.3rem;
-            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
-            font-weight: 600;
-            line-height: 1.3;
+            color: var(--text);
+            line-height: 1.4;
         }
 
         .book-author {
-            color: #5fb3d4;
-            margin-bottom: 1rem;
+            color: #666;
+            margin-bottom: 0.5rem;
             font-style: italic;
         }
 
@@ -455,1537 +460,2085 @@
             margin-bottom: 1rem;
         }
 
-        .rating-stars {
-            color: #f39c12;
-            font-size: 1.2rem;
+        .stars {
+            color: var(--warning);
         }
 
-        .rating-text {
-            color: #7f8c8d;
+        .book-description {
+            color: #666;
             font-size: 0.9rem;
-        }
-
-        .book-actions {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            display: flex;
-            gap: 0.5rem;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .book-card:hover .book-actions {
-            opacity: 1;
-        }
-
-        .action-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-btn.like {
-            background: #e74c3c;
-        }
-
-        .action-btn.recommend {
-            background: #5fb3d4;
-        }
-
-        .action-btn:hover {
-            transform: scale(1.1);
-        }
-
-        /* History Styles */
-        .history-list {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .history-item {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 15px;
+            line-height: 1.5;
             margin-bottom: 1rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
         }
 
-        .history-item:hover {
-            transform: translateX(10px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .history-info h4 {
-            color: #2c3e50;
-            margin-bottom: 0.25rem;
-        }
-
-        .history-info p {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        .history-meta {
-            color: #95a5a6;
-            font-size: 0.8rem;
-        }
-
-        /* Utility Styles */
+        /* Loading and State Styles */
         .loading {
             text-align: center;
             padding: 3rem;
-            color: #5fb3d4;
+            color: #666;
         }
 
         .spinner {
+            display: inline-block;
             width: 40px;
             height: 40px;
-            margin: 0 auto 1rem;
-            border: 4px solid #e0e0e0;
-            border-top: 4px solid #5fb3d4;
+            border: 4px solid var(--border);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
         .empty-state {
             text-align: center;
             padding: 3rem;
-            color: #7f8c8d;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--border);
         }
 
         .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
             margin-bottom: 1rem;
-            color: #5fb3d4;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .error-message, .success-message {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            padding: 1rem 2rem;
-            border-radius: 10px;
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
+            padding: 3rem 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
             font-weight: 500;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
         }
 
-        .error-message {
-            background: #e74c3c;
+        /* Responsive Design */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text);
+            cursor: pointer;
         }
 
-        .success-message {
-            background: #27ae60;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
             }
-            to {
-                transform: translateX(0);
-                opacity: 1;
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--card-bg);
+                box-shadow: var(--shadow);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                margin: 1rem;
+            }
+
+            .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .search-container {
+                margin: 1rem auto;
+            }
+
+            .dashboard-header {
+                padding: 2rem 1rem;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
             }
         }
 
+        /* Tablet responsive - 2 books per row */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animation Classes */
         .fade-in {
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            animation: fadeIn 0.5s ease-in;
         }
 
         .slide-up {
-            animation: slideUp 0.3s ease;
+            animation: slideUp 0.5s ease-out;
         }
 
         @keyframes slideUp {
             from {
-                transform: translateY(100%);
                 opacity: 0;
+                transform: translateY(30px);
             }
             to {
-                transform: translateY(0);
                 opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        /* Price Badge */
-        .price-badge {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 15px;
-            font-weight: 600;
-            font-size: 0.9rem;
+        .bounce {
+            animation: bounce 0.6s ease-out;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 1rem;
-                padding: 1rem;
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
             }
-
-            .nav-menu {
-                gap: 1rem;
+            40% {
+                transform: translateY(-10px);
             }
-
-            .logo h1 {
-                font-size: 2rem;
-            }
-
-            .hero-content h1 {
-                font-size: 2rem;
-            }
-
-            .books-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 1.5rem;
-                padding: 0 1rem;
-            }
-
-            .search-box {
-                flex-direction: column;
-            }
-
-            .history-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
+            60% {
+                transform: translateY(-5px);
             }
         }
 
-        /* Section Separators */
-        .section-separator {
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #5fb3d4, transparent);
-            margin: 2rem 0;
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 1rem; }
+        .mt-4 { margin-top: 1.5rem; }
+        
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 1rem; }
+        .mb-4 { margin-bottom: 1.5rem; }
+        
+        .hidden { display: none; }
+        .block { display: block; }
+        .flex { display: flex; }
+        
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 1rem; }
+        .gap-4 { gap: 1.5rem; }
+
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+
+        .rounded { border-radius: var(--border-radius-sm); }
+        .rounded-lg { border-radius: var(--border-radius); }
+
+        .shadow { box-shadow: var(--shadow); }
+        .shadow-lg { box-shadow: var(--shadow-lg); }
+
+        .cursor-pointer { cursor: pointer; }
+        .pointer-events-none { pointer-events: none; }
+
+        .opacity-50 { opacity: 0.5; }
+        .opacity-75 { opacity: 0.75; }
+
+        .transition { transition: var(--transition); }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        /* Book Category Badges */
-        .category-badge {
-            display: inline-block;
-            background: rgba(95, 179, 212, 0.1);
-            color: #5fb3d4;
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            margin: 0.25rem;
+        ::-webkit-scrollbar-track {
+            background: var(--background);
         }
 
-        /* Enhanced Book Cards */
-        .book-card-enhanced {
-            position: relative;
-            overflow: visible;
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
         }
 
-        .book-card-enhanced::before {
-            content: '';
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            background: linear-gradient(45deg, #5fb3d4, #4a90c2, #5fb3d4);
-            border-radius: 25px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .book-card-enhanced:hover::before {
-            opacity: 1;
-        }
-
-        /* Chat Widget Styles */
-        .chat-widget {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #5fb3d4, #4a90c2);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            box-shadow: 0 10px 25px rgba(95, 179, 212, 0.3);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .chat-widget:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 35px rgba(95, 179, 212, 0.4);
-        }
-
-        /* Special Effects */
-        .floating-books {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .floating-book {
-            position: absolute;
-            font-size: 2rem;
-            color: rgba(95, 179, 212, 0.1);
-            animation: floatBook 15s infinite linear;
-        }
-
-        @keyframes floatBook {
-            from {
-                transform: translateY(100vh) rotate(0deg);
-            }
-            to {
-                transform: translateY(-100px) rotate(360deg);
-            }
-        }
-
-        .hidden {
-            display: none !important;
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
         }
     </style>
 </head>
 <body>
-    <!-- Floating Books Background -->
-    <div class="floating-books" id="floatingBooks"></div>
-
-    <!-- Auth Page -->
-    <div class="auth-page" id="authPage">
-        <div class="auth-container">
-            <div class="auth-header">
-                <h2>Little Belle Adventures</h2>
-                <p>Discover Your Next Great Read</p>
-            </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="return showPage('home');">
+                <i class="fas fa-book-open"></i>
+                BookFinder
+            </a>
             
-            <!-- Login Form -->
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="loginUsername">Username</label>
-                    <input type="text" id="loginUsername" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" required>
-                </div>
-                <button type="submit" class="auth-btn">Login</button>
-                <div class="auth-switch">
-                    <p>Don't have an account? <a href="#" id="showRegister">Register here</a></p>
-                </div>
-                <div class="guest-access">
-                    <a href="#" id="guestAccess" class="guest-btn">Continue as Guest</a>
-                </div>
-            </form>
+            <div class="nav-menu" id="navMenu">
+                <a href="#" class="nav-link" onclick="return showPage('home');" data-page="home">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="#" class="nav-link" onclick="return showPage('recommendations');" data-page="recommendations">
+                    <i class="fas fa-magic"></i> Recommendations
+                </a>
+                <a href="#" class="nav-link" onclick="return showPage('smart-search');" data-page="smart-search">
+                    <i class="fas fa-search"></i> Smart Search
+                </a>
+                <a href="#" class="nav-link" onclick="return showPage('dashboard');" data-page="dashboard" id="dashboardLink" style="display: none;">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </div>
 
-            <!-- Register Form -->
-            <form id="registerForm" style="display: none;">
-                <div class="form-group">
-                    <label for="registerUsername">Username</label>
-                    <input type="text" id="registerUsername" required>
+            <div class="user-menu">
+                <div id="authButtons">
+                    <a href="#" class="btn btn-outline" onclick="return showPage('login');">Login</a>
+                    <a href="#" class="btn btn-primary" onclick="return showPage('register');">Register</a>
                 </div>
-                <div class="form-group">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" required>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <i class="fas fa-user"></i>
+                    <span id="username"></span>
+                    <button class="btn btn-ghost" onclick="logout()" style="margin-left: 1rem;">Logout</button>
                 </div>
-                <div class="form-group">
-                    <label for="registerPassword">Password</label>
-                    <input type="password" id="registerPassword" required>
+            </div>
+
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <div class="hero">
+                <h1>Discover Your Next Great Read</h1>
+                <p>AI-powered book recommendations tailored to your taste. Find books you'll love with our intelligent recommendation system.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="#" class="btn btn-primary" onclick="return showPage('recommendations');">
+                        <i class="fas fa-magic"></i> Get Recommendations
+                    </a>
+                    <a href="#" class="btn btn-outline" onclick="return showPage('smart-search');" style="margin-left: 1rem;">
+                        <i class="fas fa-search"></i> Smart Search
+                    </a>
                 </div>
-                <button type="submit" class="auth-btn">Register</button>
-                <div class="auth-switch">
-                    <p>Already have an account? <a href="#" id="showLogin">Login here</a></p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-fire"></i> Popular Books
+                </h2>
+                <p class="section-subtitle">Discover what's trending in the literary world</p>
+                
+                <div id="popularBooksLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading popular books...</p>
                 </div>
-                <div class="guest-access">
-                    <a href="#" id="guestAccessRegister" class="guest-btn">Continue as Guest</a>
+
+                <div id="popularBooksGrid" class="grid grid-4"></div>
+
+                <div id="popularBooksError" class="empty-state" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Unable to load popular books</h3>
+                    <p>Please try again later</p>
+                    <button class="btn btn-primary mt-3" onclick="loadPopularBooks()">Retry</button>
                 </div>
-            </form>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login" class="page">
+            <div class="form-container">
+                <div class="text-center mb-4">
+                    <i class="fas fa-sign-in-alt" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h2 style="margin-bottom: 0.5rem;">Welcome Back</h2>
+                    <p style="color: #666;">Sign in to access your personalized recommendations</p>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="loginUsername">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="loginUsername" name="username" class="form-input" placeholder="Enter your username" required>
+                        <div class="error-message" id="loginUsernameError" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="loginPassword" name="password" class="form-input" placeholder="Enter your password" required>
+                        <div class="error-message" id="loginPasswordError" style="display: none;"></div>
+                    </div>
+
+                    <div id="loginError" class="alert alert-error" style="display: none;"></div>
+
+                    <button type="submit" class="btn btn-primary w-full" id="loginButton">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p>Don't have an account? 
+                        <a href="#" onclick="showPage('register')" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            Register here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="register" class="page">
+            <div class="form-container">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-plus" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h2 style="margin-bottom: 0.5rem;">Create Account</h2>
+                    <p style="color: #666;">Join our community of book lovers</p>
+                </div>
+
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="registerUsername">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="registerUsername" name="username" class="form-input" placeholder="Choose a username" required>
+                        <div class="error-message" id="registerUsernameError" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="registerEmail">
+                            <i class="fas fa-envelope"></i> Email
+                        </label>
+                        <input type="email" id="registerEmail" name="email" class="form-input" placeholder="Enter your email" required>
+                        <div class="error-message" id="registerEmailError" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="registerPassword">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="registerPassword" name="password" class="form-input" placeholder="Create a password" required>
+                        <div class="error-message" id="registerPasswordError" style="display: none;"></div>
+                    </div>
+
+                    <div id="registerError" class="alert alert-error" style="display: none;"></div>
+                    <div id="registerSuccess" class="alert alert-success" style="display: none;"></div>
+
+                    <button type="submit" class="btn btn-primary w-full" id="registerButton">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p>Already have an account? 
+                        <a href="#" onclick="showPage('login')" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            Login here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Page -->
+        <div id="recommendations" class="page">
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-magic"></i> Book Recommendations
+                </h2>
+                <p class="section-subtitle">Enter a book you enjoyed, and we'll find similar ones you'll love</p>
+
+                <div class="search-container">
+                    <div style="position: relative;">
+                        <i class="search-icon fas fa-book"></i>
+                        <input type="text" id="recommendationInput" class="search-input" 
+                               placeholder="Enter a book title you liked..." 
+                               onkeydown="handleRecommendationSearch(event)">
+                    </div>
+                    <button type="button" class="btn btn-primary mt-3" onclick="event.preventDefault(); event.stopPropagation(); getRecommendations(); return false;" style="width: 100%;">
+                        <i class="fas fa-magic"></i> Get Recommendations
+                    </button>
+                </div>
+
+                <div id="recommendationsAlert" style="display: none;"></div>
+
+                <div id="recommendationsLoading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Finding perfect recommendations for you...</p>
+                </div>
+
+                <div id="recommendationsGrid" class="grid grid-3"></div>
+
+                <div id="recommendationsEmpty" class="empty-state" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h3>No recommendations yet</h3>
+                    <p>Enter a book title above to get personalized recommendations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Search Page -->
+        <div id="smart-search" class="page">
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-brain"></i> AI-Powered Smart Search
+                </h2>
+                <p class="section-subtitle">Search for books using natural language. Ask for anything!</p>
+
+                <div class="search-container">
+                    <div style="position: relative;">
+                        <i class="search-icon fas fa-search"></i>
+                        <input type="text" id="smartSearchInput" class="search-input" 
+                               placeholder="e.g., 'mystery novels set in Victorian London' or 'books like Harry Potter'"
+                               onkeydown="handleSmartSearch(event)">
+                    </div>
+                    
+                    <div class="search-toggle">
+                        <span style="color: #666;">Basic Search</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="aiToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span style="color: var(--primary); font-weight: 600;">AI-Powered</span>
+                    </div>
+
+                    <button type="button" class="btn btn-secondary mt-3" onclick="event.preventDefault(); event.stopPropagation(); performSmartSearch(); return false;" style="width: 100%;">
+                        <i class="fas fa-brain"></i> Smart Search
+                    </button>
+                </div>
+
+                <div id="smartSearchAlert" style="display: none;"></div>
+
+                <div id="smartSearchLoading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>AI is analyzing your search...</p>
+                </div>
+
+                <div id="smartSearchGrid" class="grid grid-3"></div>
+
+                <div id="smartSearchEmpty" class="empty-state" style="display: none;">
+                    <i class="fas fa-brain"></i>
+                    <h3>Ready to search</h3>
+                    <p>Enter your search query above and let AI find the perfect books</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page">
+            <div class="dashboard-header">
+                <h1>Your Reading Dashboard</h1>
+                <p>Track your reading journey and discover new favorites</p>
+            </div>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRecommendations">0</div>
+                    <div class="stat-label">Recommendations Received</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSearches">0</div>
+                    <div class="stat-label">Smart Searches</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="booksViewed">0</div>
+                    <div class="stat-label">Books Explored</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-star"></i> Your Personalized Recommendations
+                </h2>
+                <p class="section-subtitle">Books curated just for you based on your preferences</p>
+
+                <div id="personalizedLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading your personalized recommendations...</p>
+                </div>
+
+                <div id="personalizedGrid" class="grid grid-3"></div>
+
+                <div id="personalizedEmpty" class="empty-state" style="display: none;">
+                    <i class="fas fa-star"></i>
+                    <h3>No personalized recommendations yet</h3>
+                    <p>Start exploring books to get personalized recommendations</p>
+                    <button class="btn btn-primary mt-3" onclick="showPage('recommendations')">
+                        Get Recommendations
+                    </button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i> Your Reading History
+                </h2>
+                <p class="section-subtitle">Keep track of books you've explored</p>
+
+                <div id="historyLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading your reading history...</p>
+                </div>
+
+                <div id="historyGrid" class="grid grid-4"></div>
+
+                <div id="historyEmpty" class="empty-state" style="display: none;">
+                    <i class="fas fa-history"></i>
+                    <h3>No reading history yet</h3>
+                    <p>Your explored books will appear here</p>
+                    <button class="btn btn-primary mt-3" onclick="showPage('smart-search')">
+                        Start Exploring
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Dashboard -->
-    <div class="dashboard" id="dashboard">
-        <!-- Header -->
-        <header class="header">
-            <div class="nav-container">
-                <div class="logo">
-                    <h1>Little Belle Adventures</h1>
-                    <p>A Book Discovery Journey</p>
-                </div>
-                <nav>
-                    <ul class="nav-menu">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#books">Books</a></li>
-                        <li><a href="#recommendations" class="auth-required">For You</a></li>
-                        <li><a href="#history" class="auth-required">History</a></li>
-                    </ul>
-                </nav>
-                <div class="user-info">
-                    <span>Welcome, <span id="currentUser">Guest</span>!</span>
-                    <button class="logout-btn" id="logoutBtn" style="display: none;">Logout</button>
-                    <button class="logout-btn" id="loginPrompt" style="display: inline-block;">Login</button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Hero Section -->
-        <section class="hero-section" id="home">
-            <div class="hero-content">
-                <h1>Discover Your Next Adventure</h1>
-                <p>Let AI guide you to the perfect book for your reading journey</p>
-            </div>
-        </section>
-
-        <!-- Search Section -->
-        <section class="search-section">
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Search for books, authors, or describe what you're looking for...">
-                    <button class="search-btn" id="searchBtn">Search</button>
-                    <div class="search-suggestions" id="searchSuggestions"></div>
-                </div>
-                <div class="ai-toggle">
-                    <span>AI-Powered Search</span>
-                    <div class="toggle-switch active" id="aiToggle"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Search Results -->
-        <section class="content-section" id="searchResults" style="display: none;">
-            <div class="section-header">
-                <h2>Search Results</h2>
-                <p id="searchResultsSubtitle">Your personalized book discoveries</p>
-            </div>
-            <div class="books-grid" id="searchResultsGrid"></div>
-        </section>
-
-        <!-- Popular Books -->
-        <section class="content-section" id="books">
-            <div class="section-header">
-                <h2>Our Latest Adventures</h2>
-                <p>Trending books loved by our community</p>
-            </div>
-            <div class="books-grid" id="popularBooksGrid"></div>
-        </section>
-
-        <div class="section-separator"></div>
-
-        <!-- Personalized Recommendations -->
-        <section class="content-section auth-required" id="recommendations">
-            <div class="section-header">
-                <h2>Recommended For You</h2>
-                <p>Books curated based on your reading preferences</p>
-            </div>
-            <div class="books-grid" id="recommendationsGrid"></div>
-        </section>
-
-        <div class="section-separator auth-required"></div>
-
-        <!-- User History -->
-        <section class="content-section auth-required" id="history">
-            <div class="section-header">
-                <h2>Your Reading Journey</h2>
-                <p>Track your book discoveries and interactions</p>
-            </div>
-            <div class="history-list" id="historyList"></div>
-        </section>
-    </div>
-
-    <!-- Chat Widget -->
-    <div class="chat-widget" onclick="showSuccess('Chat feature coming soon!')">
-        💬
-    </div>
-
     <script>
-        // Debug logging function
-        const debugLog = (message, type = 'info') => {
-            const timestamp = new Date().toISOString();
-            const colors = {
-                info: '#3498db',
-                success: '#27ae60',
-                warning: '#f39c12',
-                error: '#e74c3c'
-            };
-            console.log(`%c[${timestamp}] ${message}`, `color: ${colors[type]}; font-weight: bold;`);
-        };
-
-        debugLog('=== BOOK RECOMMENDATION SYSTEM STARTING ===', 'info');
-
-        // API Configuration
-        const API_BASE_URL = 'http://127.0.0.1:8000';
-        debugLog(`API Base URL: ${API_BASE_URL}`, 'info');
-        
-        // Global state
+        // Global variables
+        const API_BASE_URL = 'http://localhost:7100';
         let currentUser = null;
         let authToken = null;
-        let aiSearchEnabled = true;
-        let searchTimeout = null;
-        let isGuestMode = false;
 
-        debugLog('Global state initialized', 'success');
-
-        // Mock data for offline/guest mode
-        const mockBooks = [
-            {
-                title: "The Midnight Library",
-                author: "Matt Haig",
-                avg_rating: 4.2,
-                price: "$14.99",
-                image_url: null
-            },
-            {
-                title: "Where the Crawdads Sing",
-                author: "Delia Owens",
-                avg_rating: 4.5,
-                price: "$16.99",
-                image_url: null
-            },
-            {
-                title: "The Seven Husbands of Evelyn Hugo",
-                author: "Taylor Jenkins Reid",
-                avg_rating: 4.3,
-                price: "$15.99",
-                image_url: null
-            },
-            {
-                title: "Educated",
-                author: "Tara Westover",
-                avg_rating: 4.4,
-                price: "$17.99",
-                image_url: null
-            },
-            {
-                title: "The Silent Patient",
-                author: "Alex Michaelides",
-                avg_rating: 4.1,
-                price: "$13.99",
-                image_url: null
-            },
-            {
-                title: "Atomic Habits",
-                author: "James Clear",
-                avg_rating: 4.6,
-                price: "$18.99",
-                image_url: null
-            }
-        ];
-
-        // DOM Elements
-        const authPage = document.getElementById('authPage');
-        const dashboard = document.getElementById('dashboard');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const showRegister = document.getElementById('showRegister');
-        const showLogin = document.getElementById('showLogin');
-        const guestAccess = document.getElementById('guestAccess');
-        const guestAccessRegister = document.getElementById('guestAccessRegister');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const loginPrompt = document.getElementById('loginPrompt');
-        const currentUserSpan = document.getElementById('currentUser');
-        const searchInput = document.getElementById('searchInput');
-        const searchSuggestions = document.getElementById('searchSuggestions');
-        const aiToggle = document.getElementById('aiToggle');
-        const searchBtn = document.getElementById('searchBtn');
-
-        debugLog('DOM elements loaded', 'success');
-
-        // Create floating books animation
-        const createFloatingBooks = () => {
-            const floatingBooks = document.getElementById('floatingBooks');
-            const bookEmojis = ['📚', '📖', '📙', '📘', '📗', '📕'];
-            
-            for (let i = 0; i < 10; i++) {
-                const book = document.createElement('div');
-                book.className = 'floating-book';
-                book.textContent = bookEmojis[Math.floor(Math.random() * bookEmojis.length)];
-                book.style.left = Math.random() * 100 + '%';
-                book.style.animationDelay = Math.random() * 15 + 's';
-                book.style.animationDuration = (15 + Math.random() * 10) + 's';
-                floatingBooks.appendChild(book);
-            }
-        };
-
-        // Utility Functions
-        const showError = (message) => {
-            debugLog(`ERROR: ${message}`, 'error');
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message slide-up';
-            errorDiv.textContent = message;
-            document.body.appendChild(errorDiv);
-            setTimeout(() => errorDiv.remove(), 5000);
-        };
-
-        const showSuccess = (message) => {
-            debugLog(`SUCCESS: ${message}`, 'success');
-            const successDiv = document.createElement('div');
-            successDiv.className = 'success-message slide-up';
-            successDiv.textContent = message;
-            document.body.appendChild(successDiv);
-            setTimeout(() => successDiv.remove(), 3000);
-        };
-
-        const createLoadingSpinner = () => {
-            debugLog('Creating loading spinner', 'info');
-            return '<div class="loading"><div class="spinner"></div>Loading...</div>';
-        };
-
-        const formatDate = (dateString) => {
-            try {
-                debugLog(`Formatting date: ${dateString}`, 'info');
-                const result = new Date(dateString).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                debugLog(`Formatted date result: ${result}`, 'success');
-                return result;
-            } catch (error) {
-                debugLog(`Date formatting error: ${error.message}`, 'error');
-                return 'Invalid Date';
-            }
-        };
-
-        const generateStars = (rating) => {
-            try {
-                debugLog(`Generating stars for rating: ${rating}`, 'info');
-                
-                if (rating === null || rating === undefined || isNaN(rating)) {
-                    debugLog(`Invalid rating value: ${rating}`, 'warning');
-                    rating = 0;
-                }
-                
-                rating = Math.max(0, Math.min(5, Number(rating)));
-                debugLog(`Normalized rating: ${rating}`, 'info');
-                
-                const fullStars = Math.floor(rating);
-                const halfStar = rating % 1 >= 0.5 ? 1 : 0;
-                const emptyStars = Math.max(0, 5 - fullStars - halfStar);
-                
-                debugLog(`Stars breakdown - Full: ${fullStars}, Half: ${halfStar}, Empty: ${emptyStars}`, 'info');
-                
-                const fullStarsStr = '★'.repeat(Math.max(0, fullStars));
-                const halfStarStr = halfStar ? '☆' : '';
-                const emptyStarsStr = '☆'.repeat(Math.max(0, emptyStars));
-                
-                const result = fullStarsStr + halfStarStr + emptyStarsStr;
-                debugLog(`Generated stars: ${result}`, 'success');
-                
-                return result;
-            } catch (error) {
-                debugLog(`Error generating stars: ${error.message}`, 'error');
-                return '☆☆☆☆☆';
-            }
-        };
-
-        // UI State Management
-        const updateUIForAuthState = (isAuthenticated) => {
-            debugLog(`Updating UI for auth state: ${isAuthenticated}`, 'info');
-            
-            const authRequiredElements = document.querySelectorAll('.auth-required');
-            authRequiredElements.forEach(element => {
-                if (isAuthenticated) {
-                    element.classList.remove('hidden');
-                } else {
-                    element.classList.add('hidden');
-                }
-            });
-
-            if (isAuthenticated) {
-                logoutBtn.style.display = 'inline-block';
-                loginPrompt.style.display = 'none';
-                currentUserSpan.textContent = currentUser || 'User';
-            } else {
-                logoutBtn.style.display = 'none';
-                loginPrompt.style.display = 'inline-block';
-                currentUserSpan.textContent = isGuestMode ? 'Guest' : 'User';
-            }
-        };
-
-        // API Functions
-        const apiCall = async (endpoint, options = {}) => {
-            const url = `${API_BASE_URL}${endpoint}`;
-            const defaultOptions = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
-                }
-            };
-
-            debugLog(`API Call: ${options.method || 'GET'} ${url}`, 'info');
-
-            try {
-                const response = await fetch(url, { ...defaultOptions, ...options });
-                debugLog(`Response status: ${response.status}`, 'info');
-                
-                let data;
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    data = await response.json();
-                    debugLog(`Response data keys: ${Object.keys(data)}`, 'info');
-                } else {
-                    const text = await response.text();
-                    debugLog(`Non-JSON response: ${text}`, 'error');
-                    throw new Error('Server returned non-JSON response');
-                }
-
-                if (!response.ok) {
-                    throw new Error(data.detail || data.message || `HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                return data;
-            } catch (error) {
-                debugLog(`API call failed: ${error.message}`, 'error');
-                
-                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-                    throw new Error('Cannot connect to server. Using offline mode.');
-                }
-                
-                throw error;
-            }
-        };
-
-        // Authentication Functions
-        const register = async (username, email, password) => {
-            debugLog(`Attempting to register user: ${username}`, 'info');
-            return await apiCall('/auth/register', {
-                method: 'POST',
-                body: JSON.stringify({ username, email, password })
-            });
-        };
-
-        const login = async (username, password) => {
-            debugLog(`Attempting to login user: ${username}`, 'info');
-            const data = await apiCall('/auth/login', {
-                method: 'POST',
-                body: JSON.stringify({ username, password })
-            });
-            
-            authToken = data.access_token;
-            currentUser = data.username;
-            isGuestMode = false;
-            
-            debugLog(`Login successful for user: ${currentUser}`, 'success');
-            return data;
-        };
-
-        const logout = () => {
-            debugLog('Logging out user', 'info');
-            authToken = null;
-            currentUser = null;
-            isGuestMode = false;
-            showDashboard(false);
-        };
-
-        const enterGuestMode = () => {
-            debugLog('Entering guest mode', 'info');
-            isGuestMode = true;
-            currentUser = null;
-            authToken = null;
-            showDashboard(true);
-        };
-
-        // UI Functions
-        const showDashboard = (show) => {
-            debugLog(`Showing dashboard: ${show}`, 'info');
-            if (show) {
-                authPage.style.display = 'none';
-                dashboard.classList.add('active');
-                updateUIForAuthState(!!authToken);
-                loadDashboardData();
-            } else {
-                authPage.style.display = 'flex';
-                dashboard.classList.remove('active');
-                isGuestMode = false;
-            }
-        };
-
-        const createBookCard = (book, showActions = true) => {
-            try {
-                debugLog(`Creating book card for: ${book?.title || 'Unknown Title'}`, 'info');
-                
-                if (!book) {
-                    debugLog('Book object is null or undefined', 'error');
-                    return '<div class="error-message">Invalid book data</div>';
-                }
-                
-                const title = book.title || 'Unknown Title';
-                const author = book.author || 'Unknown Author';
-                const rating = book.avg_rating || book.similarity_score || 4.0;
-                const price = book.price || `${(Math.random() * 10 + 10).toFixed(2)}`;
-                const imageUrl = book.image_url && book.image_url !== 'https://via.placeholder.com/150x200' 
-                    ? book.image_url 
-                    : `https://picsum.photos/280/350?random=${Math.floor(Math.random() * 1000)}`;
-
-                debugLog(`Book card data - Title: ${title}, Author: ${author}, Rating: ${rating}`, 'info');
-
-                const cardHtml = `
-                    <div class="book-card book-card-enhanced fade-in" data-title="${title}" data-author="${author}">
-                        <div class="price-badge">${price}</div>
-                        <img src="${imageUrl}" alt="${title}" class="book-image" 
-                             onerror="this.src='https://via.placeholder.com/280x350/5fb3d4/ffffff?text=${encodeURIComponent(title.substring(0, 2))}'">
-                        ${showActions && authToken ? `
-                            <div class="book-actions">
-                                <button class="action-btn like" onclick="likeBook('${title.replace(/'/g, "\\'")}', '${author.replace(/'/g, "\\'")}')">♥</button>
-                                <button class="action-btn recommend" onclick="getRecommendations('${title.replace(/'/g, "\\'")}')">→</button>
-                            </div>
-                        ` : ''}
-                        <div class="book-info">
-                            <h3 class="book-title">${title}</h3>
-                            <p class="book-author">by ${author}</p>
-                            <div class="book-rating">
-                                <span class="rating-stars">${generateStars(rating)}</span>
-                                <span class="rating-text">${Number(rating).toFixed(1)}</span>
-                                ${book.num_ratings ? `<span class="rating-text">(${book.num_ratings} reviews)</span>` : ''}
-                            </div>
-                            <div class="book-categories">
-                                <span class="category-badge">Adventure</span>
-                                <span class="category-badge">Fiction</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                debugLog('Book card created successfully', 'success');
-                return cardHtml;
-            } catch (error) {
-                debugLog(`Error creating book card: ${error.message}`, 'error');
-                return '<div class="error-message">Error displaying book</div>';
-            }
-        };
-
-        // Data Loading Functions with optimization
-        const loadPopularBooks = async () => {
-            try {
-                debugLog('=== LOADING POPULAR BOOKS ===', 'info');
-                const grid = document.getElementById('popularBooksGrid');
-                
-                if (!grid) {
-                    debugLog('Popular books grid element not found', 'error');
-                    return;
-                }
-                
-                grid.innerHTML = createLoadingSpinner();
-                debugLog('Loading spinner added to popular books grid', 'info');
-                
-                let booksToShow = [];
-                
-                try {
-                    const data = await apiCall('/books/popular');
-                    debugLog(`Popular books API response received`, 'success');
-                    
-                    if (data.books && Array.isArray(data.books)) {
-                        booksToShow = data.books.slice(0, 6); // Limit to 6 books
-                    } else if (Array.isArray(data)) {
-                        booksToShow = data.slice(0, 6);
-                    }
-                } catch (apiError) {
-                    debugLog(`API failed, using mock data: ${apiError.message}`, 'warning');
-                    booksToShow = mockBooks.slice(0, 6);
-                }
-                
-                if (booksToShow.length > 0) {
-                    debugLog(`Processing ${booksToShow.length} books`, 'info');
-                    
-                    const bookCards = [];
-                    for (let i = 0; i < booksToShow.length; i++) {
-                        const book = booksToShow[i];
-                        debugLog(`Processing book ${i + 1}: ${book?.title || 'No title'}`, 'info');
-                        
-                        try {
-                            const cardHtml = createBookCard(book);
-                            bookCards.push(cardHtml);
-                            debugLog(`Book ${i + 1} processed successfully`, 'success');
-                        } catch (bookError) {
-                            debugLog(`Error processing book ${i + 1}: ${bookError.message}`, 'error');
-                            continue;
-                        }
-                    }
-                    
-                    if (bookCards.length > 0) {
-                        grid.innerHTML = bookCards.join('');
-                        debugLog(`Successfully loaded ${bookCards.length} popular books`, 'success');
-                    } else {
-                        grid.innerHTML = '<div class="error-message">No valid books to display</div>';
-                        debugLog('No valid book cards created', 'warning');
-                    }
-                } else {
-                    grid.innerHTML = '<div class="empty-state"><h3>No popular books available</h3><p>Check back later for trending books</p></div>';
-                    debugLog('No books found', 'warning');
-                }
-            } catch (error) {
-                debugLog(`=== POPULAR BOOKS ERROR ===`, 'error');
-                debugLog(`Error: ${error.message}`, 'error');
-                
-                // Fallback to mock data
-                const grid = document.getElementById('popularBooksGrid');
-                if (grid) {
-                    const mockCards = mockBooks.slice(0, 6).map(book => createBookCard(book));
-                    grid.innerHTML = mockCards.join('');
-                    debugLog('Loaded mock popular books as fallback', 'warning');
-                }
-            }
-        };
-
-        const loadPersonalizedRecommendations = async () => {
-            if (!authToken) {
-                debugLog('No auth token, skipping personalized recommendations', 'info');
-                const grid = document.getElementById('recommendationsGrid');
-                if (grid) {
-                    grid.innerHTML = '<div class="empty-state"><h3>Login Required</h3><p>Please login to see personalized recommendations</p></div>';
-                }
-                return;
-            }
-
-            try {
-                debugLog('=== LOADING PERSONALIZED RECOMMENDATIONS ===', 'info');
-                const grid = document.getElementById('recommendationsGrid');
-                
-                if (!grid) {
-                    debugLog('Recommendations grid element not found', 'error');
-                    return;
-                }
-                
-                grid.innerHTML = createLoadingSpinner();
-                debugLog('Loading spinner added to recommendations grid', 'info');
-                
-                const data = await apiCall('/user/recommendations');
-                debugLog(`Recommendations API response received`, 'success');
-                
-                let booksArray = [];
-                if (data.books && Array.isArray(data.books)) {
-                    booksArray = data.books.slice(0, 4); // Limit to 4 books
-                } else if (data.recommendations && Array.isArray(data.recommendations)) {
-                    booksArray = data.recommendations.slice(0, 4);
-                } else if (Array.isArray(data)) {
-                    booksArray = data.slice(0, 4);
-                }
-                
-                if (booksArray.length > 0) {
-                    debugLog(`Processing ${booksArray.length} recommended books`, 'info');
-                    
-                    const bookCards = [];
-                    for (let i = 0; i < booksArray.length; i++) {
-                        const book = booksArray[i];
-                        debugLog(`Processing recommendation ${i + 1}: ${book?.title || 'No title'}`, 'info');
-                        
-                        try {
-                            const cardHtml = createBookCard(book);
-                            bookCards.push(cardHtml);
-                            debugLog(`Recommendation ${i + 1} processed successfully`, 'success');
-                        } catch (bookError) {
-                            debugLog(`Error processing recommendation ${i + 1}: ${bookError.message}`, 'error');
-                            continue;
-                        }
-                    }
-                    
-                    if (bookCards.length > 0) {
-                        grid.innerHTML = bookCards.join('');
-                        debugLog(`Successfully loaded ${bookCards.length} recommendations`, 'success');
-                    } else {
-                        grid.innerHTML = '<div class="error-message">No valid recommendations to display</div>';
-                        debugLog('No valid recommendation cards created', 'warning');
-                    }
-                } else {
-                    grid.innerHTML = '<div class="empty-state"><h3>No recommendations yet</h3><p>Start exploring books to get personalized recommendations</p></div>';
-                    debugLog('No recommendations found in response', 'info');
-                }
-            } catch (error) {
-                debugLog(`=== RECOMMENDATIONS ERROR ===`, 'error');
-                debugLog(`Error: ${error.message}`, 'error');
-                
-                const grid = document.getElementById('recommendationsGrid');
-                if (grid) {
-                    grid.innerHTML = '<div class="empty-state"><h3>No recommendations available</h3><p>Login and interact with books to get recommendations</p></div>';
-                }
-            }
-        };
-
-        const loadUserHistory = async () => {
-            if (!authToken) {
-                debugLog('No auth token, skipping user history', 'info');
-                const historyList = document.getElementById('historyList');
-                if (historyList) {
-                    historyList.innerHTML = '<div class="empty-state"><h3>Login Required</h3><p>Please login to see your reading history</p></div>';
-                }
-                return;
-            }
-
-            try {
-                debugLog('=== LOADING USER HISTORY ===', 'info');
-                const historyList = document.getElementById('historyList');
-                
-                if (!historyList) {
-                    debugLog('History list element not found', 'error');
-                    return;
-                }
-                
-                historyList.innerHTML = createLoadingSpinner();
-                debugLog('Loading spinner added to history list', 'info');
-                
-                const data = await apiCall('/user/history');
-                debugLog(`History API response received`, 'success');
-                
-                if (data.history && Array.isArray(data.history) && data.history.length > 0) {
-                    // Limit to recent 10 items
-                    const recentHistory = data.history.slice(0, 10);
-                    debugLog(`Processing ${recentHistory.length} history items`, 'info');
-                    
-                    const historyItems = recentHistory.map((item, index) => {
-                        debugLog(`Processing history item ${index + 1}: ${item?.book_title || 'No title'}`, 'info');
-                        
-                        try {
-                            return `
-                                <div class="history-item">
-                                    <div class="history-info">
-                                        <h4>${item.book_title || 'Unknown Title'}</h4>
-                                        <p>${item.author || 'Unknown Author'} • ${item.interaction_type || 'Unknown'}${item.rating ? ` • Rated ${item.rating}/5` : ''}</p>
-                                    </div>
-                                    <div class="history-meta">
-                                        ${formatDate(item.created_at)}
-                                    </div>
-                                </div>
-                            `;
-                        } catch (itemError) {
-                            debugLog(`Error processing history item ${index + 1}: ${itemError.message}`, 'error');
-                            return '';
-                        }
-                    }).filter(item => item !== '');
-                    
-                    if (historyItems.length > 0) {
-                        historyList.innerHTML = historyItems.join('');
-                        debugLog(`Successfully loaded ${historyItems.length} history items`, 'success');
-                    } else {
-                        historyList.innerHTML = '<div class="error-message">No valid history items to display</div>';
-                        debugLog('No valid history items created', 'warning');
-                    }
-                } else {
-                    historyList.innerHTML = '<div class="empty-state"><h3>No history yet</h3><p>Your book interactions will appear here</p></div>';
-                    debugLog('No history found in response', 'info');
-                }
-            } catch (error) {
-                debugLog(`=== HISTORY ERROR ===`, 'error');
-                debugLog(`Error: ${error.message}`, 'error');
-                
-                const historyList = document.getElementById('historyList');
-                if (historyList) {
-                    historyList.innerHTML = '<div class="empty-state"><h3>History unavailable</h3><p>Login to view your reading history</p></div>';
-                }
-            }
-        };
-
-        const loadDashboardData = async () => {
-            debugLog('=== LOADING DASHBOARD DATA ===', 'info');
-            debugLog(`Current user: ${currentUser}`, 'info');
-            debugLog(`Auth token exists: ${!!authToken}`, 'info');
-            debugLog(`Guest mode: ${isGuestMode}`, 'info');
-            
-            // Always load popular books (works for both guest and authenticated users)
-            await loadPopularBooks();
-            
-            // Only load user-specific data if authenticated
-            if (authToken) {
-                debugLog('Loading user-specific data...', 'info');
-                await Promise.all([
-                    loadPersonalizedRecommendations(),
-                    loadUserHistory()
-                ]);
-                debugLog('All dashboard data loading completed', 'success');
-            } else {
-                debugLog('Guest mode - skipping user-specific data', 'info');
-                // Show empty states for authenticated-only sections
-                loadPersonalizedRecommendations();
-                loadUserHistory();
-            }
-        };
-
-        // Enhanced Search Functions
-        const searchBooks = async (query, useAI = true) => {
-            try {
-                debugLog(`=== SEARCHING BOOKS ===`, 'info');
-                debugLog(`Query: "${query}", AI: ${useAI}, Guest Mode: ${isGuestMode}`, 'info');
-                
-                const resultsSection = document.getElementById('searchResults');
-                const resultsGrid = document.getElementById('searchResultsGrid');
-                const resultsSubtitle = document.getElementById('searchResultsSubtitle');
-                
-                resultsSection.style.display = 'block';
-                resultsGrid.innerHTML = createLoadingSpinner();
-                
-                let searchResults = [];
-                
-                try {
-                    const data = await apiCall('/books/smart-search', {
-                        method: 'POST',
-                        body: JSON.stringify({ 
-                            query: query,
-                            use_gemini: useAI 
-                        })
-                    });
-                    
-                    debugLog(`Search results received from API`, 'success');
-                    
-                    if (data.results && data.results.length > 0) {
-                        searchResults = data.results.slice(0, 12); // Limit search results to 12
-                        resultsSubtitle.textContent = `Found ${searchResults.length} results using ${data.method || 'search'} method`;
-                    }
-                } catch (apiError) {
-                    debugLog(`Search API failed, using mock search: ${apiError.message}`, 'warning');
-                    
-                    // Mock search functionality for offline/guest mode
-                    const mockSearchResults = mockBooks.filter(book => 
-                        book.title.toLowerCase().includes(query.toLowerCase()) ||
-                        book.author.toLowerCase().includes(query.toLowerCase())
-                    );
-                    
-                    if (mockSearchResults.length === 0 && query.length > 0) {
-                        // If no direct matches, return random books as suggestions
-                        searchResults = mockBooks.slice(0, 4);
-                        resultsSubtitle.textContent = `Showing suggested books (offline mode)`;
-                    } else {
-                        searchResults = mockSearchResults.slice(0, 8);
-                        resultsSubtitle.textContent = `Found ${searchResults.length} results (offline mode)`;
-                    }
-                }
-                
-                if (searchResults.length > 0) {
-                    const bookCards = searchResults.map(book => createBookCard(book, true));
-                    resultsGrid.innerHTML = bookCards.join('');
-                    debugLog(`Successfully displayed ${searchResults.length} search results`, 'success');
-                } else {
-                    resultsGrid.innerHTML = '<div class="empty-state"><h3>No results found</h3><p>Try adjusting your search terms</p></div>';
-                    resultsSubtitle.textContent = 'No results found';
-                    debugLog('No search results found', 'info');
-                }
-                
-                // Log interaction only if authenticated
-                if (authToken) {
-                    logInteraction(query, '', 'smart_search');
-                }
-                
-                // Smooth scroll to results
-                resultsSection.scrollIntoView({ behavior: 'smooth' });
-                
-            } catch (error) {
-                debugLog(`=== SEARCH ERROR ===`, 'error');
-                debugLog(`Error: ${error.message}`, 'error');
-                showError(`Search failed: ${error.message}`);
-                document.getElementById('searchResultsGrid').innerHTML = `<div class="error-message">Search failed: ${error.message}</div>`;
-            }
-        };
-
-        const getSuggestions = async (query) => {
-            if (!query || query.length < 2) {
-                searchSuggestions.style.display = 'none';
-                return;
-            }
-            
-            try {
-                debugLog(`Getting suggestions for: "${query}"`, 'info');
-                
-                let suggestions = [];
-                
-                try {
-                    const data = await apiCall(`/books/search?q=${encodeURIComponent(query)}`);
-                    if (data.results && data.results.length > 0) {
-                        suggestions = data.results.slice(0, 5); // Limit suggestions
-                    }
-                } catch (apiError) {
-                    debugLog(`Suggestions API failed, using mock: ${apiError.message}`, 'warning');
-                    // Mock suggestions
-                    suggestions = mockBooks
-                        .filter(book => 
-                            book.title.toLowerCase().includes(query.toLowerCase()) ||
-                            book.author.toLowerCase().includes(query.toLowerCase())
-                        )
-                        .map(book => book.title)
-                        .slice(0, 5);
-                }
-                
-                if (suggestions.length > 0) {
-                    searchSuggestions.innerHTML = suggestions.map(title => 
-                        `<div class="suggestion-item" onclick="selectSuggestion('${title.replace(/'/g, "\\'")}')">${title}</div>`
-                    ).join('');
-                    searchSuggestions.style.display = 'block';
-                    debugLog(`Showed ${suggestions.length} suggestions`, 'success');
-                } else {
-                    searchSuggestions.style.display = 'none';
-                    debugLog('No suggestions found', 'info');
-                }
-            } catch (error) {
-                debugLog(`Failed to get suggestions: ${error.message}`, 'error');
-                searchSuggestions.style.display = 'none';
-            }
-        };
-
-        const selectSuggestion = (title) => {
-            debugLog(`Selected suggestion: ${title}`, 'info');
-            searchInput.value = title;
-            searchSuggestions.style.display = 'none';
-            searchBooks(title, aiSearchEnabled);
-        };
-
-        // Book Interaction Functions
-        const likeBook = async (title, author) => {
-            if (!authToken) {
-                showError('Please login to like books');
-                return;
-            }
-
-            try {
-                debugLog(`Liking book: ${title} by ${author}`, 'info');
-                await apiCall('/user/interaction', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        book_title: title,
-                        author: author,
-                        interaction_type: 'like'
-                    })
-                });
-                showSuccess(`Added "${title}" to your liked books!`);
-                loadPersonalizedRecommendations();
-                loadUserHistory();
-                debugLog(`Successfully liked book: ${title}`, 'success');
-            } catch (error) {
-                debugLog(`Failed to like book: ${error.message}`, 'error');
-                showError('Failed to like book');
-            }
-        };
-
-        const getRecommendations = async (title) => {
-            try {
-                debugLog(`Getting recommendations for: "${title}"`, 'info');
-                
-                const resultsSection = document.getElementById('searchResults');
-                const resultsGrid = document.getElementById('searchResultsGrid');
-                const resultsSubtitle = document.getElementById('searchResultsSubtitle');
-                
-                resultsSection.style.display = 'block';
-                resultsGrid.innerHTML = createLoadingSpinner();
-                
-                let recommendations = [];
-                
-                try {
-                    const data = await apiCall('/books/recommend', {
-                        method: 'POST',
-                        body: JSON.stringify({ book_title: title })
-                    });
-                    
-                    debugLog(`Recommendation response received`, 'success');
-                    
-                    if (data.recommendations && data.recommendations.length > 0) {
-                        recommendations = data.recommendations.slice(0, 8); // Limit recommendations
-                        resultsSubtitle.textContent = `Recommendations based on "${data.based_on || title}"`;
-                    }
-                } catch (apiError) {
-                    debugLog(`Recommendations API failed, using mock: ${apiError.message}`, 'warning');
-                    // Mock recommendations - exclude the selected book
-                    recommendations = mockBooks.filter(book => book.title !== title).slice(0, 4);
-                    resultsSubtitle.textContent = `Similar books to "${title}" (offline mode)`;
-                }
-                
-                if (recommendations.length > 0) {
-                    const bookCards = recommendations.map(book => createBookCard(book));
-                    resultsGrid.innerHTML = bookCards.join('');
-                    debugLog(`Successfully displayed ${recommendations.length} recommendations`, 'success');
-                } else {
-                    resultsGrid.innerHTML = '<div class="empty-state"><h3>No recommendations found</h3><p>Try selecting another book</p></div>';
-                    debugLog('No recommendations found', 'info');
-                }
-                
-                resultsSection.scrollIntoView({ behavior: 'smooth' });
-                
-            } catch (error) {
-                debugLog(`Failed to get recommendations: ${error.message}`, 'error');
-                showError(`Failed to get recommendations: ${error.message}`);
-                document.getElementById('searchResultsGrid').innerHTML = `<div class="error-message">Failed to get recommendations: ${error.message}</div>`;
-            }
-        };
-
-        const logInteraction = async (title, author, type, rating = null) => {
-            if (!authToken) {
-                debugLog('No auth token, skipping interaction logging', 'info');
-                return;
-            }
-
-            try {
-                await apiCall('/user/interaction', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        book_title: title,
-                        author: author,
-                        interaction_type: type,
-                        rating: rating
-                    })
-                });
-                debugLog(`Logged interaction: ${type} for ${title}`, 'success');
-            } catch (error) {
-                debugLog(`Failed to log interaction: ${error.message}`, 'error');
-            }
-        };
-
-        // Event Listeners
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!username || !password) {
-                showError('Please fill in all fields');
-                return;
-            }
-            
-            try {
-                await login(username, password);
-                showSuccess('Login successful!');
-                showDashboard(true);
-            } catch (error) {
-                showError(error.message || 'Login failed');
-            }
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
         });
 
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function initializeApp() {
+            checkAuthStatus();
+            loadPopularBooks();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Mobile menu toggle
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            const navMenu = document.getElementById('navMenu');
+            
+            if (mobileMenuToggle && navMenu) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                });
+            }
+        }
+
+        // Authentication functions
+        function checkAuthStatus() {
+            const token = localStorage.getItem('authToken');
+            const username = localStorage.getItem('username');
+            
+            if (token && username) {
+                authToken = token;
+                currentUser = username;
+                updateUIForLoggedInUser();
+            } else {
+                updateUIForLoggedOutUser();
+            }
+        }
+
+        function updateUIForLoggedInUser() {
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('username').textContent = currentUser;
+            document.getElementById('dashboardLink').style.display = 'block';
+        }
+
+        function updateUIForLoggedOutUser() {
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('dashboardLink').style.display = 'none';
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const button = document.getElementById('loginButton');
+            const errorDiv = document.getElementById('loginError');
+
+            // Clear previous errors
+            clearFieldErrors('login');
+            hideElement(errorDiv);
+
+            // Validate inputs
+            if (!username || !password) {
+                showError(errorDiv, 'Please fill in all fields');
+                return;
+            }
+
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.access_token) {
+                    // Store auth data
+                    localStorage.setItem('authToken', data.access_token);
+                    localStorage.setItem('username', username);
+                    
+                    authToken = data.access_token;
+                    currentUser = username;
+
+                    // Update UI
+                    updateUIForLoggedInUser();
+                    
+                    // Show success and redirect
+                    showAlert('loginSuccess', 'Login successful! Welcome back.', 'success');
+                    
+                    setTimeout(() => {
+                        showPage('dashboard');
+                    }, 1500);
+
+                } else {
+                    showError(errorDiv, data.detail || 'Login failed. Please check your credentials.');
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(errorDiv, 'Network error. Please try again.');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            
             const username = document.getElementById('registerUsername').value.trim();
             const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
-            
+            const button = document.getElementById('registerButton');
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+
+            // Clear previous messages
+            clearFieldErrors('register');
+            hideElement(errorDiv);
+            hideElement(successDiv);
+
+            // Validate inputs
             if (!username || !email || !password) {
-                showError('Please fill in all fields');
+                showError(errorDiv, 'Please fill in all fields');
                 return;
             }
-            
+
+            if (password.length < 6) {
+                showError(errorDiv, 'Password must be at least 6 characters long');
+                return;
+            }
+
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+
             try {
-                await register(username, email, password);
-                showSuccess('Registration successful! Please login.');
-                showLogin.click();
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess(successDiv, 'Account created successfully! You can now log in.');
+                    document.getElementById('registerForm').reset();
+                    
+                    setTimeout(() => {
+                        showPage('login');
+                    }, 2000);
+
+                } else {
+                    showError(errorDiv, data.detail || 'Registration failed. Please try again.');
+                }
+
             } catch (error) {
-                showError(error.message || 'Registration failed');
+                console.error('Registration error:', error);
+                showError(errorDiv, 'Network error. Please try again.');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
             }
-        });
+        }
 
-        showRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-        });
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('username');
+            
+            authToken = null;
+            currentUser = null;
+            
+            updateUIForLoggedOutUser();
+            showPage('home');
+            
+            showToast('Logged out successfully', 'success');
+        }
 
-        showLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerForm.style.display = 'none';
-            loginForm.style.display = 'block';
-        });
-
-        // Guest access handlers
-        guestAccess.addEventListener('click', (e) => {
-            e.preventDefault();
-            enterGuestMode();
-        });
-
-        guestAccessRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            enterGuestMode();
-        });
-
-        logoutBtn.addEventListener('click', () => {
-            logout();
-        });
-
-        loginPrompt.addEventListener('click', () => {
-            showDashboard(false);
-        });
-
-        aiToggle.addEventListener('click', () => {
-            aiSearchEnabled = !aiSearchEnabled;
-            aiToggle.classList.toggle('active', aiSearchEnabled);
-            debugLog(`AI search toggled: ${aiSearchEnabled}`, 'info');
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                getSuggestions(e.target.value);
-            }, 300);
-        });
-
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                searchBtn.click();
+        // API functions
+        async function makeAuthenticatedRequest(url, options = {}) {
+            if (!authToken) {
+                throw new Error('Authentication required');
             }
-        });
 
-        searchInput.addEventListener('blur', () => {
-            setTimeout(() => {
-                searchSuggestions.style.display = 'none';
-            }, 200);
-        });
+            const headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
 
-        searchBtn.addEventListener('click', () => {
-            const query = searchInput.value.trim();
-            if (query) {
-                searchBooks(query, aiSearchEnabled);
-            } else {
-                showError('Please enter a search term');
+            const response = await fetch(url, {
+                ...options,
+                headers
+            });
+
+            if (response.status === 401) {
+                // Token expired or invalid
+                logout();
+                throw new Error('Authentication expired. Please log in again.');
             }
-        });
 
-        // Click outside suggestions to hide
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-box')) {
-                searchSuggestions.style.display = 'none';
+            return response;
+        }
+
+        async function loadPopularBooks() {
+            const loadingDiv = document.getElementById('popularBooksLoading');
+            const gridDiv = document.getElementById('popularBooksGrid');
+            const errorDiv = document.getElementById('popularBooksError');
+
+            showElement(loadingDiv);
+            hideElement(gridDiv);
+            hideElement(errorDiv);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/books/popular`);
+                const data = await response.json();
+
+                if (response.ok && data.books) {
+                    renderBookGrid(data.books, gridDiv, 9); // Limit to 9 books
+                    hideElement(loadingDiv);
+                    showElement(gridDiv);
+                } else {
+                    throw new Error(data.detail || 'Failed to load popular books');
+                }
+
+            } catch (error) {
+                console.error('Error loading popular books:', error);
+                hideElement(loadingDiv);
+                showElement(errorDiv);
             }
-        });
+        }
 
-        // Book card click handlers
-        document.addEventListener('click', (e) => {
-            const bookCard = e.target.closest('.book-card');
-            if (bookCard && !e.target.closest('.book-actions')) {
-                const title = bookCard.dataset.title;
-                const author = bookCard.dataset.author;
-                if (authToken) {
-                    logInteraction(title, author, 'view');
+        async function getRecommendations() {
+            console.log('getRecommendations called'); // Debug log
+            
+            if (!authToken) {
+                showAlert('recommendationsAlert', 'Please log in to get personalized recommendations', 'warning');
+                return;
+            }
+
+            const bookTitle = document.getElementById('recommendationInput').value.trim();
+            if (!bookTitle) {
+                showAlert('recommendationsAlert', 'Please enter a book title', 'warning');
+                return;
+            }
+
+            console.log('Starting recommendation search for:', bookTitle); // Debug log
+
+            const loadingDiv = document.getElementById('recommendationsLoading');
+            const gridDiv = document.getElementById('recommendationsGrid');
+            const alertDiv = document.getElementById('recommendationsAlert');
+            const emptyDiv = document.getElementById('recommendationsEmpty');
+
+            showElement(loadingDiv);
+            hideElement(gridDiv);
+            hideElement(alertDiv);
+            hideElement(emptyDiv);
+
+            try {
+                console.log('Making API request...'); // Debug log
+                const response = await makeAuthenticatedRequest(`${API_BASE_URL}/books/recommend`, {
+                    method: 'POST',
+                    body: JSON.stringify({ book_title: bookTitle })
+                });
+
+                const data = await response.json();
+                console.log('API response:', data); // Debug log
+
+                if (response.ok && data.recommendations) {
+                    console.log('Rendering recommendations:', data.recommendations.length); // Debug log
+                    renderBookGrid(data.recommendations, gridDiv, 6);
+                    hideElement(loadingDiv);
+                    showElement(gridDiv);
+                    
+                    // Update stats
+                    updateUserStats('recommendations');
+                    console.log('Recommendations rendered successfully'); // Debug log
+                } else {
+                    throw new Error(data.detail || 'Failed to get recommendations');
+                }
+
+            } catch (error) {
+                console.error('Error getting recommendations:', error);
+                hideElement(loadingDiv);
+                showAlert('recommendationsAlert', error.message || 'Failed to get recommendations', 'error');
+            }
+        }
+
+        async function performSmartSearch() {
+            if (!authToken) {
+                showAlert('smartSearchAlert', 'Please log in to use smart search', 'warning');
+                return;
+            }
+
+            const query = document.getElementById('smartSearchInput').value.trim();
+            if (!query) {
+                showAlert('smartSearchAlert', 'Please enter a search query', 'warning');
+                return;
+            }
+
+            const useAI = document.getElementById('aiToggle').checked;
+            const loadingDiv = document.getElementById('smartSearchLoading');
+            const gridDiv = document.getElementById('smartSearchGrid');
+            const alertDiv = document.getElementById('smartSearchAlert');
+            const emptyDiv = document.getElementById('smartSearchEmpty');
+
+            showElement(loadingDiv);
+            hideElement(gridDiv);
+            hideElement(alertDiv);
+            hideElement(emptyDiv);
+
+            try {
+                const response = await makeAuthenticatedRequest(`${API_BASE_URL}/books/smart-search`, {
+                    method: 'POST',
+                    body: JSON.stringify({ query, use_ai: useAI })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.results) {
+                    renderBookGrid(data.results, gridDiv, 9); // Limit to 9 search results
+                    hideElement(loadingDiv);
+                    showElement(gridDiv);
+                    
+                    // Update stats
+                    updateUserStats('searches');
+                } else {
+                    throw new Error(data.detail || 'Search failed');
+                }
+
+            } catch (error) {
+                console.error('Error performing smart search:', error);
+                hideElement(loadingDiv);
+                showAlert('smartSearchAlert', error.message || 'Search failed', 'error');
+            }
+        }
+
+        async function loadUserHistory() {
+            if (!authToken) return;
+
+            const loadingDiv = document.getElementById('historyLoading');
+            const gridDiv = document.getElementById('historyGrid');
+            const emptyDiv = document.getElementById('historyEmpty');
+
+            showElement(loadingDiv);
+            hideElement(gridDiv);
+            hideElement(emptyDiv);
+
+            try {
+                const response = await makeAuthenticatedRequest(`${API_BASE_URL}/user/history`);
+                const data = await response.json();
+
+                hideElement(loadingDiv);
+
+                if (response.ok && data.history && data.history.length > 0) {
+                    renderBookGrid(data.history, gridDiv, 12); // Show more history items
+                    showElement(gridDiv);
+                } else {
+                    showElement(emptyDiv);
+                }
+
+            } catch (error) {
+                console.error('Error loading user history:', error);
+                hideElement(loadingDiv);
+                showElement(emptyDiv);
+            }
+        }
+
+        async function loadPersonalizedRecommendations() {
+            if (!authToken) return;
+
+            const loadingDiv = document.getElementById('personalizedLoading');
+            const gridDiv = document.getElementById('personalizedGrid');
+            const emptyDiv = document.getElementById('personalizedEmpty');
+
+            showElement(loadingDiv);
+            hideElement(gridDiv);
+            hideElement(emptyDiv);
+
+            try {
+                const response = await makeAuthenticatedRequest(`${API_BASE_URL}/user/recommendations`);
+                const data = await response.json();
+
+                hideElement(loadingDiv);
+
+                if (response.ok && data.recommendations && data.recommendations.length > 0) {
+                    renderBookGrid(data.recommendations, gridDiv, 6); // Limit personalized recommendations to 6
+                    showElement(gridDiv);
+                } else {
+                    showElement(emptyDiv);
+                }
+
+            } catch (error) {
+                console.error('Error loading personalized recommendations:', error);
+                hideElement(loadingDiv);
+                showElement(emptyDiv);
+            }
+        }
+
+        // UI Helper functions
+        function renderBookGrid(books, container, maxBooks = null) {
+            if (!books || books.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-book"></i><h3>No books found</h3><p>Try a different search</p></div>';
+                return;
+            }
+
+            // Limit books if maxBooks is specified
+            const booksToShow = maxBooks ? books.slice(0, maxBooks) : books;
+
+            container.innerHTML = booksToShow.map(book => createBookCard(book)).join('');
+            
+            // Add animation to cards
+            const cards = container.querySelectorAll('.book-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('slide-up');
+            });
+        }
+
+        function createBookCard(book) {
+            const rating = book.rating || 0;
+            const starsHTML = generateStarsHTML(rating);
+            const description = book.description ? 
+                (book.description.length > 150 ? book.description.substring(0, 150) + '...' : book.description) : 
+                'No description available';
+
+            return `
+                <div class="book-card" onclick="trackBookView('${escapeHtml(book.title)}'); return false;">
+                    <div class="book-image">
+                        ${book.cover_image ? 
+                            `<img src="${book.cover_image}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--border-radius-sm);">` : 
+                            '<i class="fas fa-book"></i>'
+                        }
+                    </div>
+                    <div class="book-title">${escapeHtml(book.title)}</div>
+                    <div class="book-author">by ${escapeHtml(book.author || 'Unknown Author')}</div>
+                    <div class="book-rating">
+                        <div class="stars">${starsHTML}</div>
+                        <span>${rating.toFixed(1)}</span>
+                    </div>
+                    <div class="book-description">${escapeHtml(description)}</div>
+                </div>
+            `;
+        }
+
+        function generateStarsHTML(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+            let starsHTML = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+                starsHTML += '<i class="fas fa-star"></i>';
+            }
+            
+            if (hasHalfStar) {
+                starsHTML += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            for (let i = 0; i < emptyStars; i++) {
+                starsHTML += '<i class="far fa-star"></i>';
+            }
+            
+            return starsHTML;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function trackBookView(bookTitle) {
+            console.log('Book viewed:', bookTitle); // Debug log
+            updateUserStats('booksViewed');
+            
+            // Add bounce animation
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('bounce');
+                setTimeout(() => {
+                    event.currentTarget.classList.remove('bounce');
+                }, 600);
+            }
+            
+            // Prevent any potential navigation
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            return false;
+        }
+
+        function updateUserStats(statType) {
+            const stats = JSON.parse(localStorage.getItem('userStats') || '{}');
+            stats[statType] = (stats[statType] || 0) + 1;
+            localStorage.setItem('userStats', JSON.stringify(stats));
+            
+            // Update UI if on dashboard
+            if (document.getElementById('dashboard').classList.contains('active')) {
+                loadUserStats();
+            }
+        }
+
+        function loadUserStats() {
+            const stats = JSON.parse(localStorage.getItem('userStats') || '{}');
+            
+            document.getElementById('totalRecommendations').textContent = stats.recommendations || 0;
+            document.getElementById('totalSearches').textContent = stats.searches || 0;
+            document.getElementById('booksViewed').textContent = stats.booksViewed || 0;
+        }
+
+        // Page navigation - Enhanced with better event handling
+        function showPage(pageId) {
+            console.log('showPage called with:', pageId); // Debug log
+            
+            // Prevent default if event exists
+            if (window.event) {
+                window.event.preventDefault();
+                window.event.stopPropagation();
+            }
+            
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                console.log('Page changed to:', pageId); // Debug log
+                
+                // Update navigation
+                updateNavigation(pageId);
+                
+                // Load page-specific data
+                loadPageData(pageId);
+                
+                // Close mobile menu if open
+                const navMenu = document.getElementById('navMenu');
+                if (navMenu) {
+                    navMenu.classList.remove('active');
                 }
             }
+            
+            return false; // Prevent any form submission or page reload
+        }
+
+        function updateNavigation(activePageId) {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                const pageId = link.getAttribute('data-page');
+                if (pageId === activePageId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        function loadPageData(pageId) {
+            switch(pageId) {
+                case 'home':
+                    if (document.getElementById('popularBooksGrid').innerHTML === '') {
+                        loadPopularBooks();
+                    }
+                    break;
+                case 'dashboard':
+                    if (authToken) {
+                        loadUserStats();
+                        loadUserHistory();
+                        loadPersonalizedRecommendations();
+                    }
+                    break;
+            }
+        }
+
+        // Event handlers - Fixed to prevent ALL default behaviors
+        function handleRecommendationSearch(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('Enter pressed in recommendation input'); // Debug
+                getRecommendations();
+                return false;
+            }
+        }
+
+        function handleSmartSearch(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('Enter pressed in smart search input'); // Debug
+                performSmartSearch();
+                return false;
+            }
+        }
+
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Utility functions
+        function showElement(element) {
+            if (element) element.style.display = 'block';
+        }
+
+        function hideElement(element) {
+            if (element) element.style.display = 'none';
+        }
+
+        function showAlert(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas fa-${getAlertIcon(type)}"></i>
+                    ${message}
+                </div>
+            `;
+            container.style.display = 'block';
+
+            // Auto-hide after 5 seconds for non-error alerts
+            if (type !== 'error') {
+                setTimeout(() => {
+                    hideElement(container);
+                }, 5000);
+            }
+        }
+
+        function showError(element, message) {
+            if (element) {
+                element.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+                element.style.display = 'flex';
+            }
+        }
+
+        function showSuccess(element, message) {
+            if (element) {
+                element.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+                element.style.display = 'flex';
+            }
+        }
+
+        function getAlertIcon(type) {
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-triangle',
+                warning: 'exclamation-circle',
+                info: 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        function clearFieldErrors(formPrefix) {
+            const errorElements = document.querySelectorAll(`[id^="${formPrefix}"][id$="Error"]`);
+            errorElements.forEach(element => {
+                hideElement(element);
+                const input = element.previousElementSibling;
+                if (input && input.classList.contains('form-input')) {
+                    input.classList.remove('error');
+                }
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                max-width: 300px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            toast.innerHTML = `
+                <i class="fas fa-${getAlertIcon(type)}"></i>
+                ${message}
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS animations for toast
+        const toastStyles = document.createElement('style');
+        toastStyles.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(toastStyles);
+
+        // Initialize tooltips and other interactive elements
+        function initializeTooltips() {
+            const elements = document.querySelectorAll('[data-tooltip]');
+            elements.forEach(element => {
+                element.addEventListener('mouseenter', showTooltip);
+                element.addEventListener('mouseleave', hideTooltip);
+            });
+        }
+
+        function showTooltip(event) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = event.target.getAttribute('data-tooltip');
+            tooltip.style.cssText = `
+                position: absolute;
+                background: var(--text);
+                color: white;
+                padding: 0.5rem;
+                border-radius: var(--border-radius-sm);
+                font-size: 0.875rem;
+                white-space: nowrap;
+                z-index: 1000;
+                pointer-events: none;
+            `;
+            
+            document.body.appendChild(tooltip);
+            
+            const rect = event.target.getBoundingClientRect();
+            tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10}px`;
+            tooltip.style.left = `${rect.left + (rect.width - tooltip.offsetWidth) / 2}px`;
+            
+            event.target._tooltip = tooltip;
+        }
+
+        function hideTooltip(event) {
+            if (event.target._tooltip) {
+                document.body.removeChild(event.target._tooltip);
+                delete event.target._tooltip;
+            }
+        }
+
+        // Error handling for network requests
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            if (event.reason.message.includes('fetch')) {
+                showToast('Network error. Please check your connection.', 'error');
+            }
         });
 
-        // Smooth scrolling for navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
-                const target = document.getElementById(targetId);
+        // Auto-save user preferences
+        function saveUserPreferences() {
+            const preferences = {
+                aiSearchEnabled: document.getElementById('aiToggle')?.checked || true,
+                lastPage: getCurrentPage(),
+                theme: 'light' // Future feature
+            };
+            localStorage.setItem('userPreferences', JSON.stringify(preferences));
+        }
+
+        function loadUserPreferences() {
+            const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+            
+            if (preferences.aiSearchEnabled !== undefined) {
+                const aiToggle = document.getElementById('aiToggle');
+                if (aiToggle) aiToggle.checked = preferences.aiSearchEnabled;
+            }
+            
+            return preferences;
+        }
+
+        function getCurrentPage() {
+            const activePage = document.querySelector('.page.active');
+            return activePage ? activePage.id : 'home';
+        }
+
+        // Advanced search functionality
+        async function performAdvancedSearch(filters) {
+            if (!authToken) {
+                showToast('Please log in to use advanced search', 'warning');
+                return;
+            }
+
+            try {
+                const response = await makeAuthenticatedRequest(`${API_BASE_URL}/books/advanced-search`, {
+                    method: 'POST',
+                    body: JSON.stringify(filters)
+                });
+
+                const data = await response.json();
+                return response.ok ? data.results : [];
+            } catch (error) {
+                console.error('Advanced search error:', error);
+                throw error;
+            }
+        }
+
+        // Book autocomplete functionality
+        let autocompleteTimeout;
+        
+        function setupAutocomplete(inputId, suggestionsId) {
+            const input = document.getElementById(inputId);
+            const suggestions = document.getElementById(suggestionsId);
+            
+            if (!input || !suggestions) return;
+
+            input.addEventListener('input', function() {
+                clearTimeout(autocompleteTimeout);
+                const query = this.value.trim();
                 
-                // Check if target requires authentication
-                if (this.classList.contains('auth-required') && !authToken) {
-                    showError('Please login to access this feature');
+                if (query.length < 2) {
+                    suggestions.style.display = 'none';
                     return;
                 }
-                
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+
+                autocompleteTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/books/search?q=${encodeURIComponent(query)}`);
+                        const data = await response.json();
+                        
+                        if (response.ok && data.suggestions) {
+                            showAutocompleteSuggestions(suggestions, data.suggestions, input);
+                        }
+                    } catch (error) {
+                        console.error('Autocomplete error:', error);
+                    }
+                }, 300);
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!input.contains(event.target) && !suggestions.contains(event.target)) {
+                    suggestions.style.display = 'none';
                 }
             });
-        });
+        }
 
-        // Initialize App
-        const initApp = () => {
-            debugLog('=== INITIALIZING APP ===', 'info');
-            
-            // Create floating books animation
-            createFloatingBooks();
-            
-            // Start with auth page
-            showDashboard(false);
-            debugLog('App initialized, showing auth page', 'info');
-        };
-
-        // Start the application
-        document.addEventListener('DOMContentLoaded', () => {
-            debugLog('DOM loaded, starting application', 'info');
-            initApp();
-        });
-
-        // Add some sample data for demonstration if backend is not available
-        window.addEventListener('load', () => {
-            // Add a delay to show the beautiful loading animations
-            setTimeout(() => {
-                debugLog('Application fully loaded', 'success');
-            }, 1000);
-        });
-
-        // Performance optimizations
-        const debounce = (func, wait) => {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        };
-
-        // Optimized search with debouncing
-        const debouncedSearch = debounce((query) => {
-            if (query.trim()) {
-                getSuggestions(query);
+        function showAutocompleteSuggestions(container, suggestions, input) {
+            if (!suggestions || suggestions.length === 0) {
+                container.style.display = 'none';
+                return;
             }
-        }, 300);
 
-        // Replace the existing input event listener with debounced version
-        searchInput.removeEventListener('input', getSuggestions);
-        searchInput.addEventListener('input', (e) => {
-            debouncedSearch(e.target.value);
-        });
+            container.innerHTML = suggestions.map(suggestion => 
+                `<div class="autocomplete-item" onclick="selectSuggestion('${escapeHtml(suggestion)}', '${input.id}')">${escapeHtml(suggestion)}</div>`
+            ).join('');
 
-        // Intersection Observer for lazy loading (performance optimization)
-        const setupIntersectionObserver = () => {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in');
-                        observer.unobserve(entry.target);
-                    }
+            // Position suggestions below input
+            const rect = input.getBoundingClientRect();
+            container.style.cssText = `
+                position: absolute;
+                top: ${rect.bottom + window.scrollY}px;
+                left: ${rect.left + window.scrollX}px;
+                width: ${rect.width}px;
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-lg);
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 1000;
+                display: block;
+            `;
+        }
+
+        function selectSuggestion(suggestion, inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.value = suggestion;
+                
+                // Hide suggestions
+                const suggestionsContainer = document.getElementById('autocompleteSuggestions');
+                if (suggestionsContainer) {
+                    suggestionsContainer.style.display = 'none';
+                }
+                
+                // DON'T trigger automatic search - let user click the search button
+                // This prevents unwanted redirects
+            }
+        }
+
+        // Reading list functionality (future feature)
+        function addToReadingList(bookId, bookTitle) {
+            if (!authToken) {
+                showToast('Please log in to add books to your reading list', 'warning');
+                return;
+            }
+
+            let readingList = JSON.parse(localStorage.getItem('readingList') || '[]');
+            
+            if (!readingList.find(book => book.id === bookId)) {
+                readingList.push({
+                    id: bookId,
+                    title: bookTitle,
+                    addedDate: new Date().toISOString()
                 });
-            }, {
-                threshold: 0.1,
-                rootMargin: '50px'
-            });
+                
+                localStorage.setItem('readingList', JSON.stringify(readingList));
+                showToast(`Added "${bookTitle}" to your reading list`, 'success');
+                updateReadingListUI();
+            } else {
+                showToast('Book is already in your reading list', 'info');
+            }
+        }
 
-            // Observe all book cards
-            document.querySelectorAll('.book-card').forEach(card => {
-                observer.observe(card);
-            });
-        };
+        function removeFromReadingList(bookId) {
+            let readingList = JSON.parse(localStorage.getItem('readingList') || '[]');
+            readingList = readingList.filter(book => book.id !== bookId);
+            localStorage.setItem('readingList', JSON.stringify(readingList));
+            updateReadingListUI();
+            showToast('Book removed from reading list', 'success');
+        }
 
-        // Error boundary for better error handling
-        window.addEventListener('error', (e) => {
-            debugLog(`Global error: ${e.error?.message || e.message}`, 'error');
-            console.error('Global error:', e.error || e);
+        function updateReadingListUI() {
+            const readingList = JSON.parse(localStorage.getItem('readingList') || '[]');
+            const count = readingList.length;
+            
+            // Update reading list count in UI (if element exists)
+            const countElement = document.getElementById('readingListCount');
+            if (countElement) {
+                countElement.textContent = count;
+            }
+        }
+
+        // Enhanced error handling with retry functionality
+        async function makeRequestWithRetry(url, options = {}, maxRetries = 3) {
+            let lastError;
+            
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    
+                    // If request was successful, return response
+                    if (response.ok || response.status < 500) {
+                        return response;
+                    }
+                    
+                    throw new Error(`Server error: ${response.status}`);
+                } catch (error) {
+                    lastError = error;
+                    
+                    // Don't retry on client errors or auth failures
+                    if (error.message.includes('401') || error.message.includes('403')) {
+                        throw error;
+                    }
+                    
+                    // Wait before retrying (exponential backoff)
+                    if (i < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                    }
+                }
+            }
+            
+            throw lastError;
+        }
+
+        // Performance monitoring
+        function measurePerformance(operation, fn) {
+            return async function(...args) {
+                const startTime = performance.now();
+                try {
+                    const result = await fn.apply(this, args);
+                    const endTime = performance.now();
+                    console.log(`${operation} took ${endTime - startTime} milliseconds`);
+                    return result;
+                } catch (error) {
+                    const endTime = performance.now();
+                    console.error(`${operation} failed after ${endTime - startTime} milliseconds:`, error);
+                    throw error;
+                }
+            };
+        }
+
+        // Wrap key functions with performance monitoring in development
+        if (window.location.hostname === 'localhost') {
+            loadPopularBooks = measurePerformance('loadPopularBooks', loadPopularBooks);
+            getRecommendations = measurePerformance('getRecommendations', getRecommendations);
+            performSmartSearch = measurePerformance('performSmartSearch', performSmartSearch);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Only trigger shortcuts when not typing in inputs
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            switch(event.key) {
+                case '1':
+                    showPage('home');
+                    break;
+                case '2':
+                    showPage('recommendations');
+                    break;
+                case '3':
+                    showPage('smart-search');
+                    break;
+                case '4':
+                    if (authToken) showPage('dashboard');
+                    break;
+                case '/':
+                    event.preventDefault();
+                    const searchInput = document.querySelector('.search-input:visible');
+                    if (searchInput) searchInput.focus();
+                    break;
+                case 'Escape':
+                    // Close mobile menu or modals
+                    const navMenu = document.getElementById('navMenu');
+                    if (navMenu && navMenu.classList.contains('active')) {
+                        navMenu.classList.remove('active');
+                    }
+                    break;
+            }
         });
 
-        window.addEventListener('unhandledrejection', (e) => {
-            debugLog(`Unhandled promise rejection: ${e.reason}`, 'error');
-            console.error('Unhandled promise rejection:', e.reason);
+        // Service Worker registration (for future PWA functionality)
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed');
+                    });
+            });
+        }
+
+        // Theme switching (future feature)
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            showToast(`Switched to ${newTheme} theme`, 'success');
+        }
+
+        // Initialize theme on load
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+        }
+
+        // Enhanced mobile menu with swipe gestures
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(event) {
+            touchStartX = event.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(event) {
+            touchEndX = event.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 100;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                const navMenu = document.getElementById('navMenu');
+                
+                if (diff > 0) {
+                    // Swipe left - close menu
+                    navMenu.classList.remove('active');
+                } else {
+                    // Swipe right - open menu
+                    navMenu.classList.add('active');
+                }
+            }
+        }
+
+        // Accessibility improvements
+        function initializeAccessibility() {
+            // Add skip to content link
+            const skipLink = document.createElement('a');
+            skipLink.href = '#main-content';
+            skipLink.textContent = 'Skip to main content';
+            skipLink.className = 'skip-link';
+            skipLink.style.cssText = `
+                position: absolute;
+                top: -40px;
+                left: 6px;
+                background: var(--primary);
+                color: white;
+                padding: 8px;
+                text-decoration: none;
+                border-radius: 4px;
+                z-index: 9999;
+                transition: top 0.3s;
+            `;
+            
+            skipLink.addEventListener('focus', function() {
+                this.style.top = '6px';
+            });
+            
+            skipLink.addEventListener('blur', function() {
+                this.style.top = '-40px';
+            });
+            
+            document.body.insertBefore(skipLink, document.body.firstChild);
+
+            // Add main content landmark
+            const container = document.querySelector('.container');
+            if (container) {
+                container.id = 'main-content';
+                container.setAttribute('role', 'main');
+            }
+
+            // Improve focus management
+            const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+            
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Tab') {
+                    const focusable = Array.from(document.querySelectorAll(focusableElements))
+                        .filter(el => !el.disabled && !el.getAttribute('aria-hidden'));
+                    
+                    const firstFocusable = focusable[0];
+                    const lastFocusable = focusable[focusable.length - 1];
+                    
+                    if (event.shiftKey) {
+                        if (document.activeElement === firstFocusable) {
+                            lastFocusable.focus();
+                            event.preventDefault();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusable) {
+                            firstFocusable.focus();
+                            event.preventDefault();
+                        }
+                    }
+                }
+            });
+        }
+
+        // Analytics tracking (placeholder for future implementation)
+        function trackEvent(eventName, parameters = {}) {
+            // Placeholder for analytics tracking
+            console.log('Event tracked:', eventName, parameters);
+            
+            // Example: Google Analytics 4
+            // gtag('event', eventName, parameters);
+            
+            // Example: Custom analytics
+            // analytics.track(eventName, parameters);
+        }
+
+        // Enhanced initialization
+        function initializeAdvancedFeatures() {
+            initializeTheme();
+            initializeAccessibility();
+            loadUserPreferences();
+            
+            // Setup autocomplete for search inputs
+            setupAutocomplete('recommendationInput', 'autocompleteSuggestions');
+            setupAutocomplete('smartSearchInput', 'autocompleteSuggestions');
+            
+            // Track page load
+            trackEvent('page_view', {
+                page: getCurrentPage(),
+                user_type: authToken ? 'authenticated' : 'anonymous'
+            });
+        }
+
+        // Call advanced initialization after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdvancedFeatures();
+        });
+
+        // Periodic sync for user data (when online)
+        function syncUserData() {
+            if (!authToken || !navigator.onLine) return;
+
+            // Sync reading list, preferences, etc.
+            const localData = {
+                readingList: JSON.parse(localStorage.getItem('readingList') || '[]'),
+                preferences: JSON.parse(localStorage.getItem('userPreferences') || '{}'),
+                stats: JSON.parse(localStorage.getItem('userStats') || '{}')
+            };
+
+            // Send to server (implement as needed)
+            console.log('Syncing user data:', localData);
+        }
+
+        // Sync data every 5 minutes when user is active
+        setInterval(syncUserData, 5 * 60 * 1000);
+
+        // Online/offline status handling
+        window.addEventListener('online', function() {
+            showToast('Connection restored', 'success');
+            syncUserData();
+        });
+
+        window.addEventListener('offline', function() {
+            showToast('You are offline. Some features may be limited.', 'warning');
+        });
+
+        // Save user preferences when page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                saveUserPreferences();
+            }
+        });
+
+        // Clean up resources before page unload
+        window.addEventListener('beforeunload', function() {
+            saveUserPreferences();
         });
     </script>
+
+    <!-- Add autocomplete suggestions container -->
+    <div id="autocompleteSuggestions" style="display: none;"></div>
+
+    <style>
+        .autocomplete-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:hover {
+            background-color: rgba(108, 99, 255, 0.1);
+            color: var(--primary);
+        }
+
+        /* Dark theme variables (for future use) */
+        [data-theme="dark"] {
+            --background: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text: #e5e5e5;
+            --border: #404040;
+        }
+
+        /* Skip link styles */
+        .skip-link:focus {
+            clip: auto !important;
+            height: auto !important;
+            width: auto !important;
+            position: absolute !important;
+            left: 6px !important;
+            top: 6px !important;
+        }
+
+        /* Enhanced responsive design */
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .book-card {
+                padding: 1rem;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .navbar,
+            .btn,
+            .search-container {
+                display: none !important;
+            }
+            
+            .page {
+                display: block !important;
+            }
+            
+            .book-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* High contrast mode */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary: #0000FF;
+                --secondary: #FF0000;
+                --text: #000000;
+                --background: #FFFFFF;
+                --border: #000000;
+            }
+        }
+
+        /* Loading spinner improvements */
+        .spinner {
+            border-width: 3px;
+        }
+
+        .spinner.small {
+            width: 20px;
+            height: 20px;
+            border-width: 2px;
+        }
+
+        /* Button loading state */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn.loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Enhanced card hover effects */
+        .book-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.05) 0%, rgba(255, 101, 132, 0.05) 100%);
+            opacity: 0;
+            transition: var(--transition);
+            pointer-events: none;
+        }
+
+        .book-card:hover::after {
+            opacity: 1;
+        }
+
+        /* Improved focus styles */
+        .btn:focus,
+        .form-input:focus,
+        .nav-link:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Success states */
+        .form-input.success {
+            border-color: var(--success);
+        }
+
+        .form-input.success + .success-message {
+            display: flex;
+        }
+    </style>
 </body>
 </html>

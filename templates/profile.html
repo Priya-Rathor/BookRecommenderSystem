@@ -974,7 +974,7 @@
                 debugLog(`API call failed: ${error.message}`, 'error');
                 
                 if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-                    throw new Error('Cannot connect to server. Please check if the backend is running on http://127.0.0.1:8000');
+                    throw new Error('Cannot connect to server. Please check if the backend is running on http://127.0.0.1:7100');
                 }
                 
                 throw error;

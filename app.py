@@ -14,6 +14,7 @@ from contextlib import contextmanager
 import logging
 import asyncio
 import traceback
+from fastapi.responses import JSONResponse
 
 # Try to import optional dependencies
 try:
@@ -53,7 +54,7 @@ app.add_middleware(
 # Configuration with better defaults
 SECRET_KEY = os.getenv("SECRET_KEY", "9d5f4c2a8e7f6b1c3d9e2f7a0b4d6c8f9e3a2b7d1c5f0a8e4d7b2c9f1a6e3d5")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 30 * 24 * 60  
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY","AIzaSyCuK9KFbeMxI5nzr8D8RvNpSW7cunHamig")
 DATABASE_URL = os.getenv("DATABASE_URL", "user_data.db")
 
@@ -838,12 +839,18 @@ async def get_user_history(current_user: dict = Depends(get_current_user)):
 # Error handlers
 @app.exception_handler(404)
 async def not_found_handler(request, exc):
-    return {"error": "Endpoint not found"}
+    return JSONResponse(
+        status_code=404,
+        content={"error": "Endpoint not found"}
+    )
 
 @app.exception_handler(500)
 async def internal_error_handler(request, exc):
-    return {"error": "Internal server error"}
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal server error"}
+    )
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run(app, host="127.0.0.1", port=7100, reload=True)
